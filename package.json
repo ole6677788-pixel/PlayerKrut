@@ -1,7 +1,7 @@
 {
   "name": "playerkrut",
-  "version": "1.6.0",
-  "description": "Centered animated Windows music mini player with seeking and dynamic cover backdrop, changelog and reliable resizing",
+  "version": "1.7.0",
+  "description": "Yandex Music-inspired Windows music mini player with seeking and dynamic cover backdrop, changelog and reliable resizing",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
