@@ -1,6 +1,6 @@
 {
   "name": "playerkrut",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Centered animated Windows music mini player with seeking and dynamic cover backdrop, changelog and reliable resizing",
   "main": "main.js",
   "scripts": {
