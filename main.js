@@ -18,11 +18,13 @@ try {
  $meta = $task2.GetAwaiter().GetResult()
  $status = $session.GetPlaybackInfo().PlaybackStatus.ToString()
  $thumbnail = ''
+ $thumbnailType = 'image/jpeg'
  try {
    if ($null -ne $meta.Thumbnail) {
      $streamOp = $meta.Thumbnail.OpenReadAsync()
      $streamTask = $asTask.MakeGenericMethod([Windows.Storage.Streams.IRandomAccessStreamWithContentType]).Invoke($null, @($streamOp))
      $stream = $streamTask.GetAwaiter().GetResult()
+     if ($stream.ContentType) { $thumbnailType = $stream.ContentType }
      if ($stream.Size -gt 0 -and $stream.Size -lt 5000000) {
        $reader = [Windows.Storage.Streams.DataReader]::new($stream.GetInputStreamAt(0))
        $loadOp = $reader.LoadAsync([uint32]$stream.Size)
@@ -35,7 +37,7 @@ try {
      }
    }
  } catch { $thumbnail = '' }
- @{ playing=($status -eq 'Playing'); title=$meta.Title; artist=$meta.Artist; album=$meta.AlbumTitle; app=$session.SourceAppUserModelId; status=$status; thumbnail=$thumbnail } | ConvertTo-Json -Compress
+ @{ playing=($status -eq 'Playing'); title=$meta.Title; artist=$meta.Artist; album=$meta.AlbumTitle; app=$session.SourceAppUserModelId; status=$status; thumbnail=$thumbnail; thumbnailType=$thumbnailType } | ConvertTo-Json -Compress
 } catch { @{ playing=$false; title=''; artist=''; album=''; app=''; thumbnail=''; error=$_.Exception.Message } | ConvertTo-Json -Compress }`;
 function runPowerShell(script, timeout = 8000) {
  return new Promise(resolve => execFile('powershell.exe', ['-NoProfile','-ExecutionPolicy','Bypass','-Command',script], {timeout, windowsHide:true, maxBuffer: 10 * 1024 * 1024}, (err,out) => resolve({err,out})));
@@ -88,7 +90,7 @@ try {
 }
 function createWindow() {
  const {width}=screen.getPrimaryDisplay().workAreaSize;
- win=new BrowserWindow({width:430,height:205,minWidth:350,minHeight:165,maxWidth:650,maxHeight:340,x:Math.max(12,width-460),y:48,frame:false,transparent:true,resizable:true,alwaysOnTop:true,skipTaskbar:true,webPreferences:{preload:path.join(__dirname,'preload.js'),contextIsolation:true,nodeIntegration:false}});
+ win=new BrowserWindow({width:480,height:390,minWidth:360,minHeight:300,maxWidth:760,maxHeight:600,x:Math.max(12,width-460),y:48,frame:false,transparent:true,resizable:true,alwaysOnTop:true,skipTaskbar:true,webPreferences:{preload:path.join(__dirname,'preload.js'),contextIsolation:true,nodeIntegration:false}});
  win.loadFile('index.html');
  win.on('closed',()=>win=null);
 }
@@ -100,4 +102,4 @@ ipcMain.handle('open-source-app',openSourceApp);
 ipcMain.on('window:close',()=>app.quit());
 ipcMain.on('window:minimize',()=>win?.minimize());
 ipcMain.on('window:toggle-pin',()=>{if(win)win.setAlwaysOnTop(!win.isAlwaysOnTop());});
-ipcMain.on('window:scale',(_event,delta)=>{if(!win)return;const [w,h]=win.getSize();const nw=Math.max(350,Math.min(650,w+delta));const nh=Math.max(165,Math.min(340,h+Math.round(delta*0.45)));win.setSize(nw,nh);});
+ipcMain.on('window:scale',(_event,delta)=>{if(!win)return;const [w,h]=win.getSize();const step=Number(delta)||0;const nw=Math.max(360,Math.min(760,w+step));const nh=Math.max(300,Math.min(600,h+Math.round(step*0.65)));win.setMinimumSize(360,300);win.setMaximumSize(760,600);win.setSize(nw,nh,true);win.center();});
