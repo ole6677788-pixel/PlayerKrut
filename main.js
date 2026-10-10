@@ -31,7 +31,7 @@ try {
  $meta = $task2.GetAwaiter().GetResult()
  $status = $session.GetPlaybackInfo().PlaybackStatus.ToString()
  $timeline = $session.GetTimelineProperties()
- $position = [Math]::Max(0, [double]($timeline.Position - $timeline.StartTime).TotalSeconds)
+ $position = [Math]::Max(0, [double]$timeline.Position.TotalSeconds)
  $duration = [Math]::Max(0, [double]($timeline.EndTime - $timeline.StartTime).TotalSeconds)
  $thumbnail = ''
  $thumbnailType = 'image/jpeg'
@@ -59,9 +59,15 @@ function runPowerShell(script, timeout = 8000) {
  return new Promise(resolve => execFile('powershell.exe', ['-NoProfile','-ExecutionPolicy','Bypass','-Command',script], {timeout, windowsHide:true, maxBuffer: 10 * 1024 * 1024}, (err,out) => resolve({err,out})));
 }
 async function nowPlaying() {
- const {out} = await runPowerShell(ps);
- try { return JSON.parse(out.trim()); }
- catch { return {playing:false,title:'',artist:'',album:'',app:'',thumbnail:'',error:'Windows media session unavailable'}; }
+ const {out,err} = await runPowerShell(ps);
+ try {
+   const parsed = JSON.parse(String(out || '').trim());
+   if (err && !parsed.error) parsed.warning = String(err.message || err);
+   return parsed;
+ } catch {
+   const detail = err?.killed ? 'PowerShell timed out while reading Windows media session' : (String(err?.message || out || 'No output from Windows media session').trim().slice(0,220));
+   return {playing:false,title:'',artist:'',album:'',app:'',thumbnail:'',error:detail || 'Windows media session unavailable'};
+ }
 }
 async function mediaControl(action, position) {
  const script = `$ErrorActionPreference='Stop'
@@ -83,7 +89,7 @@ try {
   'playpause' { $null = Wait-Async ($session.TryTogglePlayPauseAsync()) }
   'next' { $null = Wait-Async ($session.TrySkipNextAsync()) }
   'previous' { $null = Wait-Async ($session.TrySkipPreviousAsync()) }
-  'seek' { $timeline = $session.GetTimelineProperties(); $seconds = [Math]::Max(0, [Math]::Min([double]($timeline.EndTime - $timeline.StartTime).TotalSeconds, [double]POSITION_PLACEHOLDER)); $ticks = [long]($timeline.StartTime.Ticks + ($seconds * 10000000)); $null = Wait-Async ($session.TryChangePlaybackPositionAsync($ticks)) }
+  'seek' { $timeline = $session.GetTimelineProperties(); $seconds = [Math]::Max(0, [Math]::Min([double]($timeline.EndTime - $timeline.StartTime).TotalSeconds, [double]POSITION_PLACEHOLDER)); $ticks = [long]($seconds * 10000000); $null = Wait-Async ($session.TryChangePlaybackPositionAsync($ticks)) }
  }
  'OK'
 } catch { 'ERROR: ' + $_.Exception.Message }`;
