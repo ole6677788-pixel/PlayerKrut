@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, screen, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, screen, shell, desktopCapturer } = require('electron');
 const path = require('path');
 const { execFile } = require('child_process');
 let win;
@@ -124,6 +124,12 @@ function createWindow() {
 app.whenReady().then(createWindow);
 app.on('window-all-closed',()=>app.quit());
 ipcMain.handle('now-playing',nowPlaying);
+ipcMain.handle('audio-loopback-source', async () => {
+ try {
+   const sources = await desktopCapturer.getSources({types:['screen'], thumbnailSize:{width:1,height:1}});
+   return sources.length ? {sourceId:sources[0].id} : {error:'No screen source available'};
+ } catch (error) { return {error:String(error?.message || error)}; }
+});
 ipcMain.handle('media-control',(_event,action,position)=>['playpause','next','previous','seek'].includes(action)?mediaControl(action,position):{ok:false});
 ipcMain.handle('open-source-app',openSourceApp);
 ipcMain.on('window:close',()=>app.quit());
