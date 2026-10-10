@@ -96,7 +96,7 @@ try {
 }
 function createWindow() {
  const {width}=screen.getPrimaryDisplay().workAreaSize;
- win=new BrowserWindow({width:500,height:480,minWidth:340,minHeight:250,maxWidth:760,maxHeight:620,x:Math.max(12,width-460),y:48,frame:false,transparent:true,resizable:true,alwaysOnTop:true,skipTaskbar:true,webPreferences:{preload:path.join(__dirname,'preload.js'),contextIsolation:true,nodeIntegration:false}});
+ win=new BrowserWindow({width:500,height:480,minWidth:280,minHeight:210,maxWidth:760,maxHeight:620,x:Math.max(12,width-460),y:48,frame:false,transparent:true,resizable:true,alwaysOnTop:true,skipTaskbar:true,webPreferences:{preload:path.join(__dirname,'preload.js'),contextIsolation:true,nodeIntegration:false}});
  win.loadFile('index.html');
  win.on('closed',()=>win=null);
 }
@@ -108,4 +108,5 @@ ipcMain.handle('open-source-app',openSourceApp);
 ipcMain.on('window:close',()=>app.quit());
 ipcMain.on('window:minimize',()=>win?.minimize());
 ipcMain.on('window:toggle-pin',()=>{if(win)win.setAlwaysOnTop(!win.isAlwaysOnTop());});
-ipcMain.on('window:resize-to',(_event,width,height)=>{if(!win)return;const w=Math.max(340,Math.min(760,Number(width)||500));const h=Math.max(250,Math.min(620,Number(height)||480));win.setSize(Math.round(w),Math.round(h),false);});
+ipcMain.handle('window:get-size',()=>{if(!win)return {width:500,height:480};const [width,height]=win.getSize();return {width,height}});
+ipcMain.handle('window:resize-to',(_event,width,height)=>{if(!win)return {ok:false};const w=Math.max(280,Math.min(760,Number(width)||500));const h=Math.max(210,Math.min(620,Number(height)||480));win.setMinimumSize(280,210);win.setSize(Math.round(w),Math.round(h),true);return {ok:true,width:w,height:h};});
