@@ -72,10 +72,12 @@ async function openSourceApp() {
  const d = await nowPlaying();
  const appId = String(d.app || '').trim();
  if (!appId) return {ok:false};
- if (appId.includes('!')) {
-   try { await shell.openExternal('shell:AppsFolder\\' + appId); return {ok:true}; } catch {}
- }
  const escaped = appId.replace(/'/g, "''");
+ if (appId.includes('!')) {
+   const packaged = `$id = 'APP_ID_PLACEHOLDER'; try { Start-Process explorer.exe -ArgumentList ('shell:AppsFolder\\' + $id); 'OK' } catch { 'ERROR' }`;
+   const {out:launchOut} = await runPowerShell(packaged.replace('APP_ID_PLACEHOLDER', escaped), 5000);
+   if (launchOut.trim() === 'OK') return {ok:true};
+ }
  const script = `$id = 'APP_ID_PLACEHOLDER'
 try {
  $entry = Get-StartApps | Where-Object { $_.AppID -eq $id -or $_.Name -like ('*' + [IO.Path]::GetFileNameWithoutExtension($id) + '*') } | Select-Object -First 1
