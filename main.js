@@ -13,7 +13,17 @@ try {
  $task = $asTask.MakeGenericMethod([Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager]).Invoke($null, @($op))
  $manager = $task.GetAwaiter().GetResult()
  $session = $manager.GetCurrentSession()
- if ($null -eq $session) { @{ playing=$false; title=''; artist=''; album=''; app=''; thumbnail='' } | ConvertTo-Json -Compress; exit }
+ $sessions = @($manager.GetSessions())
+ # Windows can report a stale current session; prefer a session that is actually playing.
+ $playingSession = $null
+ foreach ($candidate in $sessions) {
+   try {
+     if ($candidate.GetPlaybackInfo().PlaybackStatus.ToString() -eq 'Playing') { $playingSession = $candidate; break }
+   } catch {}
+ }
+ if ($null -ne $playingSession) { $session = $playingSession }
+ if ($null -eq $session -and $sessions.Count -gt 0) { $session = $sessions[0] }
+ if ($null -eq $session) { @{ playing=$false; title=''; artist=''; album=''; app=''; thumbnail=''; position=0; duration=0 } | ConvertTo-Json -Compress; exit }
  $op2 = $session.TryGetMediaPropertiesAsync()
  $task2 = $asTask.MakeGenericMethod([Windows.Media.Control.GlobalSystemMediaTransportControlsSessionMediaProperties]).Invoke($null, @($op2))
  $meta = $task2.GetAwaiter().GetResult()
@@ -29,7 +39,7 @@ try {
      $streamTask = $asTask.MakeGenericMethod([Windows.Storage.Streams.IRandomAccessStreamWithContentType]).Invoke($null, @($streamOp))
      $stream = $streamTask.GetAwaiter().GetResult()
      if ($stream.ContentType) { $thumbnailType = $stream.ContentType }
-     if ($stream.Size -gt 0 -and $stream.Size -lt 5000000) {
+     if ($stream.Size -gt 0 -and $stream.Size -lt 3000000) {
        $reader = [Windows.Storage.Streams.DataReader]::new($stream.GetInputStreamAt(0))
        $loadOp = $reader.LoadAsync([uint32]$stream.Size)
        $loadTask = $asTask.MakeGenericMethod([uint32]).Invoke($null, @($loadOp))
