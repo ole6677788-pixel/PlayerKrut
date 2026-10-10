@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, screen, shell } = require('electron');
 const path = require('path');
 const { execFile } = require('child_process');
 let win;
@@ -12,27 +12,90 @@ try {
  $task = $asTask.MakeGenericMethod([Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager]).Invoke($null, @($op))
  $manager = $task.GetAwaiter().GetResult()
  $session = $manager.GetCurrentSession()
- if ($null -eq $session) { @{ playing=$false; title=''; artist='' } | ConvertTo-Json -Compress; exit }
+ if ($null -eq $session) { @{ playing=$false; title=''; artist=''; album=''; app=''; thumbnail='' } | ConvertTo-Json -Compress; exit }
  $op2 = $session.TryGetMediaPropertiesAsync()
  $task2 = $asTask.MakeGenericMethod([Windows.Media.Control.GlobalSystemMediaTransportControlsSessionMediaProperties]).Invoke($null, @($op2))
  $meta = $task2.GetAwaiter().GetResult()
  $status = $session.GetPlaybackInfo().PlaybackStatus.ToString()
- @{ playing=($status -eq 'Playing'); title=$meta.Title; artist=$meta.Artist; album=$meta.AlbumTitle; app=$session.SourceAppUserModelId; status=$status } | ConvertTo-Json -Compress
-} catch { @{ playing=$false; title=''; artist=''; error=$_.Exception.Message } | ConvertTo-Json -Compress }`;
-function nowPlaying() {
- return new Promise(resolve => execFile('powershell.exe',['-NoProfile','-ExecutionPolicy','Bypass','-Command',ps],{timeout:6000,windowsHide:true},(err,out)=>{
-  try { resolve(JSON.parse(out.trim())); } catch { resolve({playing:false,title:'',artist:'',error:'Windows media session unavailable'}); }
- }));
+ $thumbnail = ''
+ try {
+   if ($null -ne $meta.Thumbnail) {
+     $streamOp = $meta.Thumbnail.OpenReadAsync()
+     $streamTask = $asTask.MakeGenericMethod([Windows.Storage.Streams.IRandomAccessStreamWithContentType]).Invoke($null, @($streamOp))
+     $stream = $streamTask.GetAwaiter().GetResult()
+     if ($stream.Size -gt 0 -and $stream.Size -lt 5000000) {
+       $reader = [Windows.Storage.Streams.DataReader]::new($stream.GetInputStreamAt(0))
+       $loadOp = $reader.LoadAsync([uint32]$stream.Size)
+       $loadTask = $asTask.MakeGenericMethod([uint32]).Invoke($null, @($loadOp))
+       $null = $loadTask.GetAwaiter().GetResult()
+       $bytes = New-Object byte[] ([int]$stream.Size)
+       $reader.ReadBytes($bytes)
+       $thumbnail = [Convert]::ToBase64String($bytes)
+       $reader.Dispose()
+     }
+   }
+ } catch { $thumbnail = '' }
+ @{ playing=($status -eq 'Playing'); title=$meta.Title; artist=$meta.Artist; album=$meta.AlbumTitle; app=$session.SourceAppUserModelId; status=$status; thumbnail=$thumbnail } | ConvertTo-Json -Compress
+} catch { @{ playing=$false; title=''; artist=''; album=''; app=''; thumbnail=''; error=$_.Exception.Message } | ConvertTo-Json -Compress }`;
+function runPowerShell(script, timeout = 8000) {
+ return new Promise(resolve => execFile('powershell.exe', ['-NoProfile','-ExecutionPolicy','Bypass','-Command',script], {timeout, windowsHide:true, maxBuffer: 10 * 1024 * 1024}, (err,out) => resolve({err,out})));
+}
+async function nowPlaying() {
+ const {out} = await runPowerShell(ps);
+ try { return JSON.parse(out.trim()); }
+ catch { return {playing:false,title:'',artist:'',album:'',app:'',thumbnail:'',error:'Windows media session unavailable'}; }
+}
+async function mediaControl(action) {
+ const script = `$ErrorActionPreference='Stop'
+try {
+ Add-Type -AssemblyName System.Runtime.WindowsRuntime
+ $null = [Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager, Windows.Media.Control, ContentType=WindowsRuntime]
+ $methods = [System.WindowsRuntimeSystemExtensions].GetMethods() | Where-Object { $_.Name -eq 'AsTask' -and $_.GetParameters().Count -eq 1 -and $_.GetParameters()[0].ParameterType.Name -eq ('IAsyncOperation' + [char]96 + '1') }
+ $asTask = $methods | Select-Object -First 1
+ $op = [Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager]::RequestAsync()
+ $task = $asTask.MakeGenericMethod([Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager]).Invoke($null, @($op))
+ $manager = $task.GetAwaiter().GetResult()
+ $session = $manager.GetCurrentSession()
+ if ($null -eq $session) { 'NO_SESSION'; exit }
+ switch ('ACTION_PLACEHOLDER') {
+  'playpause' { $null = $session.TryTogglePlayPauseAsync() }
+  'next' { $null = $session.TrySkipNextAsync() }
+  'previous' { $null = $session.TrySkipPreviousAsync() }
+ }
+ 'OK'
+} catch { 'ERROR: ' + $_.Exception.Message }`;
+ const safeScript = script.replace('ACTION_PLACEHOLDER', action);
+ const {out} = await runPowerShell(safeScript, 6000);
+ return {ok:out.trim()==='OK',message:out.trim()};
+}
+async function openSourceApp() {
+ const d = await nowPlaying();
+ const appId = String(d.app || '').trim();
+ if (!appId) return {ok:false};
+ if (appId.includes('!')) {
+   try { await shell.openExternal('shell:AppsFolder\\' + appId); return {ok:true}; } catch {}
+ }
+ const escaped = appId.replace(/'/g, "''");
+ const script = `$id = 'APP_ID_PLACEHOLDER'
+try {
+ $entry = Get-StartApps | Where-Object { $_.AppID -eq $id -or $_.Name -like ('*' + [IO.Path]::GetFileNameWithoutExtension($id) + '*') } | Select-Object -First 1
+ if ($entry) { Start-Process explorer.exe -ArgumentList ('shell:AppsFolder\\' + $entry.AppID); 'OK' } else { 'NOT_FOUND' }
+} catch { 'ERROR' }`;
+ const {out} = await runPowerShell(script.replace('APP_ID_PLACEHOLDER', escaped), 5000);
+ return {ok:out.trim()==='OK'};
 }
 function createWindow() {
  const {width}=screen.getPrimaryDisplay().workAreaSize;
- win=new BrowserWindow({width:390,height:150,minWidth:330,minHeight:120,maxWidth:500,maxHeight:230,x:Math.max(12,width-420),y:48,frame:false,transparent:true,resizable:true,alwaysOnTop:true,skipTaskbar:true,webPreferences:{preload:path.join(__dirname,'preload.js'),contextIsolation:true,nodeIntegration:false}});
+ win=new BrowserWindow({width:430,height:205,minWidth:350,minHeight:165,maxWidth:650,maxHeight:340,x:Math.max(12,width-460),y:48,frame:false,transparent:true,resizable:true,alwaysOnTop:true,skipTaskbar:true,webPreferences:{preload:path.join(__dirname,'preload.js'),contextIsolation:true,nodeIntegration:false}});
  win.loadFile('index.html');
  win.on('closed',()=>win=null);
 }
 app.whenReady().then(createWindow);
 app.on('window-all-closed',()=>app.quit());
 ipcMain.handle('now-playing',nowPlaying);
+ipcMain.handle('media-control',(_event,action)=>['playpause','next','previous'].includes(action)?mediaControl(action):{ok:false});
+ipcMain.handle('open-source-app',openSourceApp);
 ipcMain.on('window:close',()=>app.quit());
 ipcMain.on('window:minimize',()=>win?.minimize());
 ipcMain.on('window:toggle-pin',()=>{if(win)win.setAlwaysOnTop(!win.isAlwaysOnTop());});
+ipcMain.on('window:scale',(_event,delta)=>{if(!win)return;const [w,h]=win.getSize();const nw=Math.max(350,Math.min(650,w+delta));const nh=Math.max(165,Math.min(340,h+Math.round(delta*0.45)));win.setSize(nw,nh);});
