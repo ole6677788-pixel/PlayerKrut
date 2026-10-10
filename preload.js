@@ -1,10 +1,10 @@
 const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('playerAPI', {
   getNowPlaying: () => ipcRenderer.invoke('now-playing'),
-  control: action => ipcRenderer.invoke('media-control', action),
+  control: (action, position) => ipcRenderer.invoke('media-control', action, position),
   openSourceApp: () => ipcRenderer.invoke('open-source-app'),
   close: () => ipcRenderer.send('window:close'),
   minimize: () => ipcRenderer.send('window:minimize'),
   togglePin: () => ipcRenderer.send('window:toggle-pin'),
-  scale: delta => ipcRenderer.send('window:scale', delta)
+  resizeTo: (width, height) => ipcRenderer.send('window:resize-to', width, height)
 });
