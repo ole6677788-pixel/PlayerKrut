@@ -17,6 +17,9 @@ try {
  $task2 = $asTask.MakeGenericMethod([Windows.Media.Control.GlobalSystemMediaTransportControlsSessionMediaProperties]).Invoke($null, @($op2))
  $meta = $task2.GetAwaiter().GetResult()
  $status = $session.GetPlaybackInfo().PlaybackStatus.ToString()
+ $timeline = $session.GetTimelineProperties()
+ $position = [Math]::Max(0, [double]$timeline.Position.TotalSeconds)
+ $duration = [Math]::Max(0, [double]($timeline.EndTime - $timeline.StartTime).TotalSeconds)
  $thumbnail = ''
  $thumbnailType = 'image/jpeg'
  try {
@@ -37,7 +40,7 @@ try {
      }
    }
  } catch { $thumbnail = '' }
- @{ playing=($status -eq 'Playing'); title=$meta.Title; artist=$meta.Artist; album=$meta.AlbumTitle; app=$session.SourceAppUserModelId; status=$status; thumbnail=$thumbnail; thumbnailType=$thumbnailType } | ConvertTo-Json -Compress
+ @{ playing=($status -eq 'Playing'); title=$meta.Title; artist=$meta.Artist; album=$meta.AlbumTitle; app=$session.SourceAppUserModelId; status=$status; thumbnail=$thumbnail; thumbnailType=$thumbnailType; position=$position; duration=$duration } | ConvertTo-Json -Compress
 } catch { @{ playing=$false; title=''; artist=''; album=''; app=''; thumbnail=''; error=$_.Exception.Message } | ConvertTo-Json -Compress }`;
 function runPowerShell(script, timeout = 8000) {
  return new Promise(resolve => execFile('powershell.exe', ['-NoProfile','-ExecutionPolicy','Bypass','-Command',script], {timeout, windowsHide:true, maxBuffer: 10 * 1024 * 1024}, (err,out) => resolve({err,out})));
@@ -47,7 +50,7 @@ async function nowPlaying() {
  try { return JSON.parse(out.trim()); }
  catch { return {playing:false,title:'',artist:'',album:'',app:'',thumbnail:'',error:'Windows media session unavailable'}; }
 }
-async function mediaControl(action) {
+async function mediaControl(action, position) {
  const script = `$ErrorActionPreference='Stop'
 try {
  Add-Type -AssemblyName System.Runtime.WindowsRuntime
@@ -63,10 +66,11 @@ try {
   'playpause' { $null = $session.TryTogglePlayPauseAsync() }
   'next' { $null = $session.TrySkipNextAsync() }
   'previous' { $null = $session.TrySkipPreviousAsync() }
+  'seek' { $ticks = [long]([Math]::Max(0, [Math]::Min(86400, [double]POSITION_PLACEHOLDER)) * 10000000); $null = $session.TryChangePlaybackPositionAsync($ticks) }
  }
  'OK'
 } catch { 'ERROR: ' + $_.Exception.Message }`;
- const safeScript = script.replace('ACTION_PLACEHOLDER', action);
+ const safeScript = script.replace('ACTION_PLACEHOLDER', action).replace('POSITION_PLACEHOLDER', String(Number(position) || 0));
  const {out} = await runPowerShell(safeScript, 6000);
  return {ok:out.trim()==='OK',message:out.trim()};
 }
@@ -97,9 +101,9 @@ function createWindow() {
 app.whenReady().then(createWindow);
 app.on('window-all-closed',()=>app.quit());
 ipcMain.handle('now-playing',nowPlaying);
-ipcMain.handle('media-control',(_event,action)=>['playpause','next','previous'].includes(action)?mediaControl(action):{ok:false});
+ipcMain.handle('media-control',(_event,action,position)=>['playpause','next','previous','seek'].includes(action)?mediaControl(action,position):{ok:false});
 ipcMain.handle('open-source-app',openSourceApp);
 ipcMain.on('window:close',()=>app.quit());
 ipcMain.on('window:minimize',()=>win?.minimize());
 ipcMain.on('window:toggle-pin',()=>{if(win)win.setAlwaysOnTop(!win.isAlwaysOnTop());});
-ipcMain.on('window:scale',(_event,delta)=>{if(!win)return;const [w,h]=win.getSize();const step=Number(delta)||0;const nw=Math.max(360,Math.min(760,w+step));const nh=Math.max(300,Math.min(600,h+Math.round(step*0.65)));win.setMinimumSize(360,300);win.setMaximumSize(760,600);win.setSize(nw,nh,true);win.center();});
+ipcMain.on('window:resize-to',(_event,width,height)=>{if(!win)return;const w=Math.max(340,Math.min(760,Number(width)||500));const h=Math.max(250,Math.min(620,Number(height)||480));win.setSize(Math.round(w),Math.round(h),false);});
