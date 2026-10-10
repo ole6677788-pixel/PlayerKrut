@@ -1,6 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('playerAPI', {
-  getNowPlaying: () => ipcRenderer.invoke('now-playing'),
+  getNowPlaying: knownCoverId => ipcRenderer.invoke('now-playing', knownCoverId),
   getAudioLoopbackSource: () => ipcRenderer.invoke('audio-loopback-source'),
   control: (action, position) => ipcRenderer.invoke('media-control', action, position),
   openSourceApp: () => ipcRenderer.invoke('open-source-app'),
