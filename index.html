@@ -155,7 +155,7 @@ async function update() {
   $('orbWrap').classList.toggle('playing', !!(d && d.playing));
   $('title').textContent = has ? d.title : 'Ничего не играет';
   $('artist').textContent = has ? (d.artist || 'Неизвестный исполнитель') : ((d && d.error) ? d.error : 'Запусти музыку — я покажу трек');
-  $('source').textContent = has ? String(d.app || 'DESKTOP').split('!')[0].split(/[.\\/]/).pop().slice(0, 24).toUpperCase() : 'DESKTOP PLAYER';
+  $('source').textContent = has ? String(d.app || 'DESKTOP').split('!')[0].split('.').pop().slice(0, 24).toUpperCase() : 'DESKTOP PLAYER';
   $('playpause').textContent = d && d.playing ? 'Ⅱ' : '▶';
   $('status').textContent = d && d.error ? 'ОШИБКА МЕДИАСЕССИИ' : d && d.playing ? 'ВОСПРОИЗВЕДЕНИЕ' : has ? 'ПАУЗА' : 'ОЖИДАНИЕ МУЗЫКИ';
   basePosition = Math.max(0, Number(d && d.position) || 0);
@@ -247,7 +247,7 @@ const grip = $('resizeGrip');
 let resizing = false, startX = 0, startY = 0, startW = 0, startH = 0;
 grip.addEventListener('pointerdown', event => {
  resizing = true; startX = event.screenX; startY = event.screenY;
- window.playerAPI.getWindowSize().then(size => { startW = size.width; startH = size.height; });
+ const bounds = $('shell').getBoundingClientRect(); startW = bounds.width; startH = bounds.height;
  try { grip.setPointerCapture(event.pointerId); } catch (_) {}
  event.preventDefault(); event.stopPropagation();
 });
