@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain, screen } = require('electron');
 const path = require('path');
 const { execFile } = require('child_process');
 let win;
-const ps = String.raw\`$ErrorActionPreference = 'Stop'
+const ps = String.raw`$ErrorActionPreference = 'Stop'
 try {
  Add-Type -AssemblyName System.Runtime.WindowsRuntime
  $null = [Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager, Windows.Media.Control, ContentType=WindowsRuntime]
