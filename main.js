@@ -12,16 +12,18 @@ try {
  $op = [Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager]::RequestAsync()
  $task = $asTask.MakeGenericMethod([Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager]).Invoke($null, @($op))
  $manager = $task.GetAwaiter().GetResult()
- $session = $manager.GetCurrentSession()
  $sessions = @($manager.GetSessions())
- # Windows can report a stale current session; prefer a session that is actually playing.
- $playingSession = $null
+ $session = $null
  foreach ($candidate in $sessions) {
    try {
-     if ($candidate.GetPlaybackInfo().PlaybackStatus.ToString() -eq 'Playing') { $playingSession = $candidate; break }
+     $candidateStatus = $candidate.GetPlaybackInfo().PlaybackStatus.ToString()
+     $candidateMetaOp = $candidate.TryGetMediaPropertiesAsync()
+     $candidateMetaTask = $asTask.MakeGenericMethod([Windows.Media.Control.GlobalSystemMediaTransportControlsSessionMediaProperties]).Invoke($null, @($candidateMetaOp))
+     $candidateMeta = $candidateMetaTask.GetAwaiter().GetResult()
+     if ($candidateStatus -eq 'Playing' -and -not [string]::IsNullOrWhiteSpace($candidateMeta.Title)) { $session = $candidate; break }
    } catch {}
  }
- if ($null -ne $playingSession) { $session = $playingSession }
+ if ($null -eq $session) { $session = $manager.GetCurrentSession() }
  if ($null -eq $session -and $sessions.Count -gt 0) { $session = $sessions[0] }
  if ($null -eq $session) { @{ playing=$false; title=''; artist=''; album=''; app=''; thumbnail=''; position=0; duration=0 } | ConvertTo-Json -Compress; exit }
  $op2 = $session.TryGetMediaPropertiesAsync()
@@ -29,7 +31,7 @@ try {
  $meta = $task2.GetAwaiter().GetResult()
  $status = $session.GetPlaybackInfo().PlaybackStatus.ToString()
  $timeline = $session.GetTimelineProperties()
- $position = [Math]::Max(0, [double]$timeline.Position.TotalSeconds)
+ $position = [Math]::Max(0, [double]($timeline.Position - $timeline.StartTime).TotalSeconds)
  $duration = [Math]::Max(0, [double]($timeline.EndTime - $timeline.StartTime).TotalSeconds)
  $thumbnail = ''
  $thumbnailType = 'image/jpeg'
@@ -72,13 +74,16 @@ try {
  $op = [Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager]::RequestAsync()
  $task = $asTask.MakeGenericMethod([Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager]).Invoke($null, @($op))
  $manager = $task.GetAwaiter().GetResult()
- $session = $manager.GetCurrentSession()
+ $sessions = @($manager.GetSessions())
+ $session = $null
+ foreach ($candidate in $sessions) { try { if ($candidate.GetPlaybackInfo().PlaybackStatus.ToString() -eq 'Playing') { $session = $candidate; break } } catch {} }
+ if ($null -eq $session) { $session = $manager.GetCurrentSession() }
  if ($null -eq $session) { 'NO_SESSION'; exit }
  switch ('ACTION_PLACEHOLDER') {
   'playpause' { $null = Wait-Async ($session.TryTogglePlayPauseAsync()) }
   'next' { $null = Wait-Async ($session.TrySkipNextAsync()) }
   'previous' { $null = Wait-Async ($session.TrySkipPreviousAsync()) }
-  'seek' { $ticks = [long]([Math]::Max(0, [Math]::Min(86400, [double]POSITION_PLACEHOLDER)) * 10000000); $null = Wait-Async ($session.TryChangePlaybackPositionAsync($ticks)) }
+  'seek' { $timeline = $session.GetTimelineProperties(); $seconds = [Math]::Max(0, [Math]::Min([double]($timeline.EndTime - $timeline.StartTime).TotalSeconds, [double]POSITION_PLACEHOLDER)); $ticks = [long]($timeline.StartTime.Ticks + ($seconds * 10000000)); $null = Wait-Async ($session.TryChangePlaybackPositionAsync($ticks)) }
  }
  'OK'
 } catch { 'ERROR: ' + $_.Exception.Message }`;
