@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PlayerKrut · 1.11.0</title>
+<title>PlayerKrut · 1.12.0</title>
 <style>
-:root{color-scheme:dark;--accent:#D98383;--accent-soft:#d997a3;--text:#f8f4f5;--muted:#ffffff9c;--panel:#0b090c}
+:root{color-scheme:dark;--accent:#D98383;--accent-soft:#d997a3;--text:#f8f4f5;--muted:#ffffff9c;--panel:#0b090c;--bar-fill:#b57487;--bar-rail:#4a3a44}
 *{box-sizing:border-box}
 html,body{width:100%;height:100%;min-width:0;min-height:0;margin:0;overflow:hidden;background:transparent;color:var(--text);font-family:Inter,"Segoe UI",Arial,sans-serif;user-select:none}
 body{padding:0}
 button{font:inherit}
 .shell{position:relative;isolation:isolate;display:flex;flex-direction:column;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden;padding:10px 12px 8px;border:1px solid #ffffff12;border-radius:16px;background:#09080bed;box-shadow:0 14px 38px #0008}
 .shell:before{content:"";position:absolute;inset:-28px;z-index:0;pointer-events:none;background-image:linear-gradient(180deg,#0807094d 0%,#0807099c 54%,#080709f2 100%),var(--cover-image,none);background-position:center;background-size:cover;filter:blur(28px) saturate(1.3);opacity:.85;transform:scale(1.12)}
-#aurora{position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;opacity:.96}
+#aurora{position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;opacity:.96;filter:blur(14px)}
 .ui-layer{position:relative;z-index:1;display:flex;flex:1 1 auto;flex-direction:column;min-width:0;min-height:0}
 .top{display:flex;flex:0 0 auto;align-items:center;justify-content:space-between;gap:8px;min-width:0;min-height:23px;-webkit-app-region:drag}
 .brand{flex:0 0 auto;font-size:9px;font-weight:850;letter-spacing:1.35px;color:#ffffffc9}
@@ -25,13 +25,17 @@ button{font:inherit}
 .cover-scene{position:relative;display:grid;flex:0 1 auto;place-items:center;width:min(43vw,30vh,158px);min-width:54px;max-width:48%;aspect-ratio:1;margin:0 auto}
 .cover-cloud{position:absolute;inset:-24%;border-radius:50%;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,#d9838368 0%,#b35bc533 38%,#7151bd12 62%,transparent 74%);filter:blur(clamp(15px,4vh,28px));opacity:.9}
 .orb-wrap{position:relative;width:100%;height:100%;min-width:0;min-height:0}
-.orb{position:absolute;inset:0;overflow:hidden;border:1px solid #ffffff24;border-radius:clamp(9px,2vw,15px);background:linear-gradient(135deg,#33282f,#1b171c);box-shadow:0 12px 30px #0009;transition:box-shadow .25s ease}
-.orb img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.orb{position:absolute;inset:0;overflow:hidden;border:1px solid #ffffff24;border-radius:clamp(9px,2vw,15px);background:linear-gradient(135deg,#3a2c35,#1b171c);box-shadow:0 12px 30px #0009;transition:box-shadow .25s ease}
+.orb img{position:relative;display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.cover-ph{position:absolute;inset:0;display:grid;place-items:center;color:#ffffff4d;font-size:clamp(22px,7vh,44px);line-height:1;pointer-events:none}
+.orb-wrap.has-cover .cover-ph{display:none}
 .orb-wrap.playing .orb{box-shadow:0 12px 30px #0009,0 0 0 1px #d9838340;animation:coverbeat 3.4s ease-in-out infinite}
 .track-info{display:flex;flex:0 1 auto;flex-direction:column;align-items:center;width:100%;max-width:380px;min-width:0;overflow:hidden;padding:0 2px;text-align:center}
-.title{display:block;width:100%;max-width:100%;min-width:0;margin:0;padding:8px 14px;overflow:hidden;border:1px solid #ffffff12;border-radius:999px;background:linear-gradient(90deg,#d997a3 0%,#d997a3 var(--track-progress,0%),#55434e var(--track-progress,0%),#55434e 100%);box-shadow:0 5px 22px #0003,inset 0 1px #ffffff2b,0 0 18px #d997a31b;color:#fff;font-size:clamp(12px,3.8vw,17px);font-weight:760;line-height:1.2;letter-spacing:-.2px;text-align:center;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;touch-action:none;-webkit-app-region:no-drag;transition:filter .15s ease}
+.title{position:relative;display:block;width:100%;max-width:100%;min-width:0;margin:0;padding:8px 14px;overflow:hidden;border:1px solid #ffffff12;border-radius:999px;background:linear-gradient(90deg,var(--bar-fill) 0%,var(--bar-fill) var(--track-progress,0%),var(--bar-rail) var(--track-progress,0%),var(--bar-rail) 100%);box-shadow:0 5px 22px #0003,inset 0 1px #ffffff2b,0 0 18px #d997a31b;color:#fff;font-size:clamp(12px,3.8vw,17px);font-weight:760;line-height:1.2;letter-spacing:-.2px;text-align:center;text-shadow:0 1px 3px #000a;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;touch-action:none;-webkit-app-region:no-drag;transition:filter .15s ease}
 .title:hover{filter:brightness(1.08)}
 .title:focus-visible{outline:2px solid #f3c2cb;outline-offset:2px}
+.title.no-seek{cursor:default}
+.title.no-seek:hover{filter:none}
 .artist{display:block;width:100%;max-width:100%;min-width:0;margin-top:5px;overflow:hidden;color:#ffffffc9;font-size:clamp(10px,2.8vw,12px);line-height:1.25;text-overflow:ellipsis;white-space:nowrap}
 .time-row{display:flex;flex:0 0 auto;align-items:center;justify-content:space-between;width:100%;min-width:0;margin-top:5px;color:#ffffff80;font-size:9px;font-variant-numeric:tabular-nums;pointer-events:none}
 .controls{display:flex;flex:0 0 auto;align-items:center;justify-content:center;gap:clamp(12px,4vw,19px);margin:7px 0 5px}
@@ -42,7 +46,10 @@ button{font:inherit}
 .ctrl.open{display:none}
 .footer{display:flex;flex:0 0 auto;align-items:center;gap:8px;min-width:0;padding-top:4px;color:#ffffff70;font-size:8px;letter-spacing:.4px}
 .status{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.source{flex:0 1 auto;max-width:45%;overflow:hidden;text-align:right;text-overflow:ellipsis;white-space:nowrap}
+.bass{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#ffffff55}
+.bass.live{color:#e7a9b4}
+.bass.off{color:#ffffff48}
+.source{flex:0 1 auto;max-width:35%;overflow:hidden;text-align:right;text-overflow:ellipsis;white-space:nowrap}
 .changelog{position:absolute;inset:0;z-index:5;display:none;align-items:center;justify-content:center;overflow:auto;padding:12px;border-radius:16px;background:#09080bf0;backdrop-filter:blur(18px)}
 .changelog.open{display:flex}
 .change-card{width:100%;max-width:380px;padding:15px;border:1px solid #ffffff18;border-radius:15px;background:linear-gradient(145deg,#2b2027f5,#141115fa);box-shadow:0 15px 40px #0008}
@@ -78,6 +85,7 @@ button{font:inherit}
  .winbtn{width:21px;height:21px}
  .stage{gap:5px}
  .controls{gap:10px}
+ .source{display:none}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
@@ -89,7 +97,7 @@ button{font:inherit}
   <div class="top">
    <div class="brand">PLAYERKRUT</div>
    <div class="actions">
-    <button class="version" id="version" title="Что нового">v1.11.0</button>
+    <button class="version" id="version" title="Что нового">v1.12.0</button>
     <button class="winbtn sizebtn" id="smaller" title="Уменьшить окно" aria-label="Уменьшить окно">−</button>
     <button class="winbtn sizebtn" id="larger" title="Увеличить окно" aria-label="Увеличить окно">+</button>
     <button class="winbtn" id="pin" title="Поверх окон" aria-label="Поверх окон">⌖</button>
@@ -100,10 +108,10 @@ button{font:inherit}
   <div class="stage">
    <div class="cover-scene">
     <div class="cover-cloud"></div>
-    <div class="orb-wrap" id="orbWrap"><div class="orb"><img id="art" alt="Обложка текущего трека" style="display:none"></div></div>
+    <div class="orb-wrap" id="orbWrap"><div class="orb"><div class="cover-ph" aria-hidden="true">♪</div><img id="art" alt="Обложка текущего трека" style="display:none"></div></div>
    </div>
    <div class="track-info">
-    <div class="title" id="title" role="slider" tabindex="0" aria-label="Название трека и перемотка" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" title="Нажми или перетащи для перемотки">Ищем музыку…</div>
+    <div class="title no-seek" id="title" role="slider" tabindex="0" aria-label="Название трека и перемотка" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" title="Нажми или перетащи для перемотки">Ищем музыку…</div>
     <div class="artist" id="artist">Запусти музыку в поддерживаемом приложении</div>
     <div class="time-row"><span id="elapsed">0:00</span><span id="duration">0:00</span></div>
    </div>
@@ -114,76 +122,150 @@ button{font:inherit}
    <button class="ctrl" id="next" title="Следующий трек" aria-label="Следующий трек">⏭</button>
    <button class="ctrl open" id="openapp" title="Вернуться в приложение с музыкой">↗ Открыть</button>
   </div>
-  <div class="footer"><div class="status" id="status">ОЖИДАНИЕ МУЗЫКИ</div><div class="source" id="source">DESKTOP PLAYER</div></div>
+  <div class="footer"><div class="status" id="status">ОЖИДАНИЕ МУЗЫКИ</div><div class="bass off" id="bassState" title="">ЗВУК: НЕ ПОДКЛЮЧЁН</div><div class="source" id="source">DESKTOP PLAYER</div></div>
  </div>
  <div class="changelog" id="changelog" aria-hidden="true">
   <div class="change-card">
    <div class="change-head"><div><div class="change-kicker">PLAYERKRUT</div><div class="change-title">Что нового</div></div><button class="winbtn" id="closeChanges" aria-label="Закрыть список изменений">×</button></div>
-   <div class="change-version">Версия 1.11.0 · 11.10.2026</div>
-   <div class="change-item"><b>Обновлённый жидкий фон</b><span>Плавные розово-малиновые и фиолетовые переливы позади интерфейса без декоративных полос эквалайзера.</span></div>
-   <div class="change-item"><b>Название стало шкалой времени</b><span>Заполнение плашки показывает позицию трека; по ней можно нажимать и перетаскивать для перемотки.</span></div>
-   <div class="change-item"><b>Исправлено отображение трека</b><span>Обложка, название и исполнитель обновляются независимо от необязательных элементов интерфейса и корректно масштабируются.</span></div>
+   <div class="change-version">Версия 1.12.0 · 11.10.2026</div>
+   <div class="change-item"><b>Реальная реакция на бас</b><span>Анализ системного звука через Web Audio API с одним анализатором. Если захват недоступен, в строке состояния это видно, а анимация только плавно дрейфует без имитации ударов.</span></div>
+   <div class="change-item"><b>Шкала на плашке названия</b><span>Перемотка не откатывается назад после отпускания, клавиши ← → ↑ ↓ PgUp PgDn Home End работают с задержкой отправки, при отсутствии поддержки перемотки источником показывается сообщение.</span></div>
+   <div class="change-item"><b>Обложка и нагрузка</b><span>Исправлен показ сломанной картинки, добавлена заглушка. Обложка читается из Windows только при смене трека, анимация рисуется в уменьшенном разрешении и останавливается в свёрнутом окне.</span></div>
    <button class="change-done" id="doneChanges">Понятно</button>
   </div>
  </div>
  <div class="resize-grip" id="resizeGrip" title="Потяни, чтобы изменить размер"></div>
 </div>
 <script>
+'use strict';
 const $ = id => document.getElementById(id);
-let busy = false, phase = 0, seeking = false, draggingTitle = false;
-let basePosition = 0, baseDuration = 0, baseStamp = Date.now(), basePlaying = false;
-let seekTarget = 0, bassLevel = 0, bassTarget = 0, audioAnalyser = null, audioData = null, audioContext = null;
-let resizeFrame = 0;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const fmt = value => { const s = Math.max(0, Math.floor(Number(value) || 0)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
-function currentPosition() { return Math.max(0, Math.min(baseDuration || Infinity, basePosition + (basePlaying ? (Date.now() - baseStamp) / 1000 : 0))); }
+const setText = (node, text) => { if (node.textContent !== text) node.textContent = text; };
+
+const dom = {
+ shell: $('shell'), title: $('title'), artist: $('artist'), elapsed: $('elapsed'), duration: $('duration'),
+ art: $('art'), orbWrap: $('orbWrap'), status: $('status'), source: $('source'), bass: $('bassState'), playpause: $('playpause')
+};
+const state = {
+ busy: false, dragging: false, playing: false,
+ basePosition: 0, baseDuration: 0, baseStamp: Date.now(), basePlaying: false,
+ seekTarget: 0, ignorePollUntil: 0, coverId: 0,
+ statusText: 'ОЖИДАНИЕ МУЗЫКИ', statusUntil: 0, statusTimer: 0
+};
+
+/* ---------- Прогресс и перемотка (единственная шкала — плашка названия) ---------- */
+function currentPosition() {
+ const raw = state.basePosition + (state.basePlaying ? (Date.now() - state.baseStamp) / 1000 : 0);
+ return state.baseDuration > 0 ? clamp(raw, 0, state.baseDuration) : Math.max(0, raw);
+}
+let lastPct = '', lastSec = -1, lastDur = -1;
 function renderProgress(position) {
- const pct = baseDuration > 0 ? Math.max(0, Math.min(100, position / baseDuration * 100)) : 0;
- $('title').style.setProperty('--track-progress', pct + '%');
- $('title').setAttribute('aria-valuemax', String(Math.floor(baseDuration)));
- $('title').setAttribute('aria-valuenow', String(Math.floor(position)));
- $('elapsed').textContent = fmt(position);
- $('duration').textContent = fmt(baseDuration);
+ const dur = state.baseDuration;
+ const pct = (dur > 0 ? clamp(position / dur * 100, 0, 100) : 0).toFixed(2) + '%';
+ if (pct !== lastPct) { dom.title.style.setProperty('--track-progress', pct); lastPct = pct; }
+ const sec = Math.floor(position), d = Math.floor(dur);
+ if (sec !== lastSec) {
+  lastSec = sec;
+  setText(dom.elapsed, fmt(position));
+  dom.title.setAttribute('aria-valuenow', String(sec));
+  dom.title.setAttribute('aria-valuetext', fmt(position) + (dur > 0 ? ' из ' + fmt(dur) : ''));
+ }
+ if (d !== lastDur) {
+  lastDur = d;
+  setText(dom.duration, fmt(dur));
+  dom.title.setAttribute('aria-valuemax', String(d));
+  dom.title.classList.toggle('no-seek', !(dur > 0));
+ }
+}
+function flashStatus(text) {
+ state.statusUntil = Date.now() + 2600;
+ setText(dom.status, text);
+ clearTimeout(state.statusTimer);
+ state.statusTimer = setTimeout(() => { state.statusUntil = 0; setText(dom.status, state.statusText); }, 2650);
+}
+
+/* ---------- Обложка, название, исполнитель ---------- */
+let wantedCover = '';
+dom.art.addEventListener('load', () => {
+ if (dom.art.getAttribute('src') !== wantedCover || !wantedCover) return;
+ dom.art.style.display = 'block';
+ dom.orbWrap.classList.add('has-cover');
+ dom.shell.style.setProperty('--cover-image', 'url("' + wantedCover.replace(/"/g, '%22') + '")');
+});
+dom.art.addEventListener('error', () => {
+ if (dom.art.getAttribute('src') !== wantedCover) return;
+ clearCover();
+});
+function clearCover() {
+ wantedCover = '';
+ dom.art.removeAttribute('src');
+ dom.art.style.display = 'none';
+ dom.orbWrap.classList.remove('has-cover');
+ dom.shell.style.setProperty('--cover-image', 'none');
+}
+function setCover(src) {
+ if (!src) { if (wantedCover || dom.art.hasAttribute('src')) clearCover(); return; }
+ if (src === wantedCover) return;
+ wantedCover = src;
+ dom.art.src = src;
+}
+function coverSource(d) {
+ const t = String(d.thumbnail || '');
+ if (!t) return '';
+ return t.startsWith('data:') ? t : 'data:' + (d.thumbnailType || 'image/jpeg') + ';base64,' + t;
+}
+
+function applyNowPlaying(d) {
+ const has = !!d.title, playing = !!d.playing, now = Date.now();
+ state.playing = playing;
+ dom.shell.classList.toggle('idle', !playing);
+ dom.orbWrap.classList.toggle('playing', playing);
+ setText(dom.title, has ? String(d.title) : 'Ничего не играет');
+ setText(dom.artist, has ? (d.artist || 'Неизвестный исполнитель') : (d.error ? String(d.error) : 'Запусти музыку — я покажу трек'));
+ setText(dom.source, has ? String(d.app || 'DESKTOP').split('!')[0].split('.').pop().slice(0, 24).toUpperCase() : 'DESKTOP PLAYER');
+ setText(dom.playpause, playing ? 'Ⅱ' : '▶');
+ state.statusText = d.error ? 'ОШИБКА МЕДИАСЕССИИ' : playing ? 'ВОСПРОИЗВЕДЕНИЕ' : has ? 'ПАУЗА' : 'ОЖИДАНИЕ МУЗЫКИ';
+ if (now >= state.statusUntil) setText(dom.status, state.statusText);
+
+ if (playing !== state.basePlaying) {
+  state.basePosition = currentPosition(); state.baseStamp = now; state.basePlaying = playing;
+ }
+ state.baseDuration = Math.max(0, Number(d.duration) || 0);
+ if (!state.dragging && now >= state.ignorePollUntil) {
+  state.basePosition = Math.max(0, Number(d.position) || 0);
+  state.baseStamp = now;
+ }
+ if (!state.dragging) renderProgress(currentPosition());
+
+ const cid = Number(d.coverId) || 0;
+ if (!has || cid === 0) { state.coverId = 0; setCover(''); }
+ else if (d.thumbnail) {
+  const src = coverSource(d);
+  if (src) { state.coverId = cid; setCover(src); }
+ }
 }
 async function update() {
- if (busy) return;
- busy = true;
+ if (state.busy || document.hidden) return;
+ state.busy = true;
  try {
-  const d = await window.playerAPI.getNowPlaying();
-  const has = !!(d && d.title);
-  const shell = $('shell'), art = $('art');
-  shell.classList.toggle('idle', !d || !d.playing);
-  $('orbWrap').classList.toggle('playing', !!(d && d.playing));
-  $('title').textContent = has ? d.title : 'Ничего не играет';
-  $('artist').textContent = has ? (d.artist || 'Неизвестный исполнитель') : ((d && d.error) ? d.error : 'Запусти музыку — я покажу трек');
-  $('source').textContent = has ? String(d.app || 'DESKTOP').split('!')[0].split('.').pop().slice(0, 24).toUpperCase() : 'DESKTOP PLAYER';
-  $('playpause').textContent = d && d.playing ? 'Ⅱ' : '▶';
-  $('status').textContent = d && d.error ? 'ОШИБКА МЕДИАСЕССИИ' : d && d.playing ? 'ВОСПРОИЗВЕДЕНИЕ' : has ? 'ПАУЗА' : 'ОЖИДАНИЕ МУЗЫКИ';
-  basePosition = Math.max(0, Number(d && d.position) || 0);
-  baseDuration = Math.max(0, Number(d && d.duration) || 0);
-  baseStamp = Date.now();
-  basePlaying = !!(d && d.playing);
-  if (!seeking) renderProgress(basePosition);
-  if (d && d.thumbnail) {
-   const src = String(d.thumbnail).startsWith('data:') ? d.thumbnail : 'data:' + (d.thumbnailType || 'image/jpeg') + ';base64,' + d.thumbnail;
-   if (art.getAttribute('src') !== src) {
-    art.onerror = () => { art.style.display = 'none'; shell.style.setProperty('--cover-image', 'none'); };
-    art.onload = () => { shell.style.setProperty('--cover-image', 'url("' + src + '")'); };
-    art.src = src;
-   }
-   if (art.complete && art.naturalWidth > 0) { art.style.display = 'block'; shell.style.setProperty('--cover-image', 'url("' + src + '")'); }
-   else if (art.getAttribute('src') === src) art.style.display = 'block';
-  } else {
-   art.onerror = null; art.onload = null; art.removeAttribute('src'); art.style.display = 'none';
-   shell.style.setProperty('--cover-image', 'none');
-  }
+  const d = await window.playerAPI.getNowPlaying(state.coverId);
+  applyNowPlaying(d || {});
  } catch (error) {
-  $('title').textContent = 'Музыка пока не найдена';
-  $('artist').textContent = 'Windows: ' + String(error && error.message || 'не удалось прочитать данные');
- } finally { busy = false; }
+  setText(dom.title, 'Музыка пока не найдена');
+  setText(dom.artist, 'Windows: ' + String(error && error.message || 'не удалось прочитать данные'));
+  clearCover(); state.coverId = 0;
+ } finally { state.busy = false; }
 }
 async function control(action, position) {
- try { await window.playerAPI.control(action, position); } finally { setTimeout(update, 400); }
+ let result;
+ try { result = await window.playerAPI.control(action, position); }
+ catch (error) { result = { ok: false, message: String(error && error.message || error) }; }
+ setTimeout(update, 450);
+ return result;
 }
+
+/* ---------- Кнопки ---------- */
 const changelog = $('changelog');
 function toggleChanges(open) { changelog.classList.toggle('open', open); changelog.setAttribute('aria-hidden', String(!open)); }
 $('version').onclick = () => toggleChanges(true);
@@ -201,145 +283,278 @@ $('openapp').onclick = async () => {
 $('close').onclick = () => window.playerAPI.close();
 $('min').onclick = () => window.playerAPI.minimize();
 $('pin').onclick = () => window.playerAPI.togglePin();
-function seekFromPointer(event) {
- const rect = $('title').getBoundingClientRect();
- const fraction = Math.max(0, Math.min(1, (event.clientX - rect.left) / Math.max(1, rect.width)));
- seekTarget = Math.round(baseDuration * fraction);
- basePosition = seekTarget; baseStamp = Date.now();
- renderProgress(seekTarget);
+
+/* ---------- Перемотка мышью и клавиатурой ---------- */
+async function commitSeek(target) {
+ state.basePosition = target; state.baseStamp = Date.now();
+ state.ignorePollUntil = Date.now() + 1500;
+ renderProgress(target);
+ const result = await control('seek', target);
+ if (!result || !result.ok) {
+  state.ignorePollUntil = 0;
+  flashStatus(result && result.message === 'UNSUPPORTED' ? 'ИСТОЧНИК НЕ ПОДДЕРЖИВАЕТ ПЕРЕМОТКУ' : 'НЕ УДАЛОСЬ ПЕРЕМОТАТЬ');
+ }
 }
-$('title').addEventListener('pointerdown', event => {
- if (baseDuration <= 0) return;
- draggingTitle = true; seeking = true;
- try { $('title').setPointerCapture(event.pointerId); } catch (_) {}
+function seekFromPointer(event) {
+ const rect = dom.title.getBoundingClientRect();
+ const fraction = clamp((event.clientX - rect.left) / Math.max(1, rect.width), 0, 1);
+ state.seekTarget = Math.round(state.baseDuration * fraction);
+ renderProgress(state.seekTarget);
+}
+dom.title.addEventListener('pointerdown', event => {
+ if (state.baseDuration <= 0 || (event.pointerType === 'mouse' && event.button !== 0)) return;
+ state.dragging = true;
+ try { dom.title.setPointerCapture(event.pointerId); } catch (_) {}
  seekFromPointer(event); event.preventDefault();
 });
-$('title').addEventListener('pointermove', event => { if (draggingTitle) seekFromPointer(event); });
-async function finishTitleSeek(event) {
- if (!draggingTitle) return;
- if (event && event.pointerId !== undefined) { try { $('title').releasePointerCapture(event.pointerId); } catch (_) {} }
- draggingTitle = false;
- const target = seekTarget;
- try { await window.playerAPI.control('seek', target); }
- finally { seeking = false; setTimeout(update, 350); }
+dom.title.addEventListener('pointermove', event => { if (state.dragging) seekFromPointer(event); });
+function endDrag(event, commit) {
+ if (!state.dragging) return;
+ try { dom.title.releasePointerCapture(event.pointerId); } catch (_) {}
+ state.dragging = false;
+ if (commit) commitSeek(state.seekTarget);
+ else { state.ignorePollUntil = 0; renderProgress(currentPosition()); update(); }
 }
-$('title').addEventListener('pointerup', finishTitleSeek);
-$('title').addEventListener('pointercancel', finishTitleSeek);
-$('title').addEventListener('keydown', event => {
- if (!baseDuration || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+dom.title.addEventListener('pointerup', event => endDrag(event, true));
+dom.title.addEventListener('pointercancel', event => endDrag(event, false));
+
+let keyTarget = null, keyTimer = 0;
+const keySteps = { ArrowLeft: -5, ArrowDown: -5, ArrowRight: 5, ArrowUp: 5, PageDown: -15, PageUp: 15 };
+dom.title.addEventListener('keydown', event => {
+ if (state.baseDuration <= 0) return;
+ const isStep = Object.prototype.hasOwnProperty.call(keySteps, event.key);
+ if (!isStep && event.key !== 'Home' && event.key !== 'End') return;
  event.preventDefault();
- let target = currentPosition();
- if (event.key === 'ArrowLeft') target -= 5;
- if (event.key === 'ArrowRight') target += 5;
- if (event.key === 'Home') target = 0;
- if (event.key === 'End') target = baseDuration;
- target = Math.max(0, Math.min(baseDuration, target));
- seeking = true; basePosition = target; baseStamp = Date.now(); renderProgress(target);
- control('seek', target).finally(() => { seeking = false; });
+ let target = keyTarget === null ? currentPosition() : keyTarget;
+ if (isStep) target += keySteps[event.key];
+ else target = event.key === 'Home' ? 0 : state.baseDuration;
+ target = clamp(target, 0, state.baseDuration);
+ keyTarget = target;
+ state.basePosition = target; state.baseStamp = Date.now();
+ state.ignorePollUntil = Date.now() + 1500;
+ renderProgress(target);
+ clearTimeout(keyTimer);
+ keyTimer = setTimeout(() => { const t = keyTarget; keyTarget = null; if (t !== null) commitSeek(t); }, 250);
 });
+
+/* ---------- Размер окна ---------- */
 async function changeSize(dw, dh) {
  const size = await window.playerAPI.getWindowSize();
- window.playerAPI.resizeTo(Math.max(280, Math.min(760, size.width + dw)), Math.max(210, Math.min(620, size.height + dh)));
+ window.playerAPI.resizeTo(clamp(size.width + dw, 280, 760), clamp(size.height + dh, 210, 620));
 }
 $('smaller').onclick = () => changeSize(-48, -32);
 $('larger').onclick = () => changeSize(48, 32);
 const grip = $('resizeGrip');
-let resizing = false, startX = 0, startY = 0, startW = 0, startH = 0;
+let resizing = false, startX = 0, startY = 0, startW = 0, startH = 0, resizeFrame = 0;
 grip.addEventListener('pointerdown', event => {
  resizing = true; startX = event.screenX; startY = event.screenY;
- const bounds = $('shell').getBoundingClientRect(); startW = bounds.width; startH = bounds.height;
+ const bounds = dom.shell.getBoundingClientRect(); startW = bounds.width; startH = bounds.height;
  try { grip.setPointerCapture(event.pointerId); } catch (_) {}
  event.preventDefault(); event.stopPropagation();
 });
 grip.addEventListener('pointermove', event => {
  if (!resizing) return;
- const width = Math.max(280, Math.min(760, startW + event.screenX - startX));
- const height = Math.max(210, Math.min(620, startH + event.screenY - startY));
+ const width = clamp(startW + event.screenX - startX, 280, 760);
+ const height = clamp(startH + event.screenY - startY, 210, 620);
  cancelAnimationFrame(resizeFrame);
  resizeFrame = requestAnimationFrame(() => window.playerAPI.resizeTo(width, height));
 });
-function stopResize() { resizing = false; }
+const stopResize = () => { resizing = false; };
 grip.addEventListener('pointerup', stopResize);
 grip.addEventListener('pointercancel', stopResize);
-async function startBassCapture() {
+grip.addEventListener('lostpointercapture', stopResize);
+
+/* ---------- Захват системного звука (один раз, без утечек) ---------- */
+const audio = { ctx: null, stream: null, source: null, analyser: null, sink: null, data: null, state: 'idle', starting: null, retries: 0, retryTimer: 0, gestureTried: false };
+function setBassUi(kind) {
+ const map = {
+  idle: ['off', 'ЗВУК: НЕ ПОДКЛЮЧЁН', ''],
+  connecting: ['off', 'ЗАХВАТ ЗВУКА…', ''],
+  live: ['live', 'БАС: РЕАЛЬНЫЙ ЗВУК', 'Анимация реагирует на низкие частоты системного звука'],
+  unavailable: ['off', 'НЕТ ЗАХВАТА ЗВУКА', 'Системный звук недоступен: анимация не реагирует на бас, а только плавно дрейфует']
+ };
+ const [cls, text, hint] = map[kind];
+ dom.bass.className = 'bass ' + cls;
+ setText(dom.bass, text);
+ dom.bass.title = hint;
+}
+function stopAudio() {
+ const { source, analyser, sink, stream, ctx } = audio;
+ clearTimeout(audio.retryTimer);
+ for (const node of [source, analyser, sink]) { try { node && node.disconnect(); } catch (_) {} }
+ if (stream) stream.getTracks().forEach(track => { track.onended = null; try { track.stop(); } catch (_) {} });
+ if (ctx) { ctx.onstatechange = null; if (ctx.state !== 'closed') ctx.close().catch(() => {}); }
+ audio.ctx = audio.stream = audio.source = audio.analyser = audio.sink = audio.data = null;
+ audio.state = 'idle';
+ agc.init = false;
+}
+async function acquireStream() {
  try {
-  const sourceInfo = await window.playerAPI.getAudioLoopbackSource();
-  if (!sourceInfo || !sourceInfo.sourceId) return;
-  const stream = await navigator.mediaDevices.getUserMedia({
-   audio: { mandatory: { chromeMediaSource: 'desktop', chromeMediaSourceId: sourceInfo.sourceId } },
-   video: { mandatory: { chromeMediaSource: 'desktop', chromeMediaSourceId: sourceInfo.sourceId } }
-  });
-  stream.getVideoTracks().forEach(track => track.stop());
-  audioContext = new AudioContext();
-  if (audioContext.state === 'suspended') await audioContext.resume();
-  const source = audioContext.createMediaStreamSource(stream);
-  audioAnalyser = audioContext.createAnalyser();
-  audioAnalyser.fftSize = 2048;
-  audioAnalyser.smoothingTimeConstant = .72;
-  source.connect(audioAnalyser);
-  audioData = new Uint8Array(audioAnalyser.frequencyBinCount);
- } catch (error) {
-  console.warn('System audio capture unavailable:', error);
+  const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+  if (stream.getAudioTracks().length) return stream;
+  stream.getTracks().forEach(track => track.stop());
+ } catch (error) { console.warn('getDisplayMedia loopback failed:', error); }
+ const info = await window.playerAPI.getAudioLoopbackSource();
+ if (!info || !info.sourceId) throw new Error(info && info.error || 'нет источника звука');
+ return navigator.mediaDevices.getUserMedia({
+  audio: { mandatory: { chromeMediaSource: 'desktop', chromeMediaSourceId: info.sourceId } },
+  video: { mandatory: { chromeMediaSource: 'desktop', chromeMediaSourceId: info.sourceId } }
+ });
+}
+function onAudioLost() {
+ stopAudio();
+ setBassUi('unavailable');
+ if (audio.retries < 3) {
+  audio.retries++;
+  audio.retryTimer = setTimeout(startAudio, 5000 * audio.retries);
  }
 }
-function sampleBass() {
- if (!audioAnalyser || !audioData || !audioContext) { bassTarget = 0; return; }
- audioAnalyser.getByteFrequencyData(audioData);
- const hzPerBin = audioContext.sampleRate / audioAnalyser.fftSize;
+function startAudio() {
+ if (audio.state === 'live') return Promise.resolve(true);
+ if (audio.starting) return audio.starting;
+ audio.starting = (async () => {
+  setBassUi('connecting');
+  try {
+   const stream = await acquireStream();
+   audio.stream = stream;
+   stream.getVideoTracks().forEach(track => { track.stop(); stream.removeTrack(track); });
+   const track = stream.getAudioTracks()[0];
+   if (!track) throw new Error('в потоке нет звуковой дорожки');
+   const ctx = new AudioContext({ latencyHint: 'playback' });
+   audio.ctx = ctx;
+   if (ctx.state === 'suspended') await ctx.resume();
+   audio.source = ctx.createMediaStreamSource(stream);
+   audio.analyser = ctx.createAnalyser();
+   audio.analyser.fftSize = 2048;
+   audio.analyser.smoothingTimeConstant = .6;
+   audio.analyser.minDecibels = -85;
+   audio.analyser.maxDecibels = -25;
+   audio.sink = ctx.createGain();
+   audio.sink.gain.value = 0;
+   audio.source.connect(audio.analyser);
+   audio.analyser.connect(audio.sink);
+   audio.sink.connect(ctx.destination);
+   audio.data = new Uint8Array(audio.analyser.frequencyBinCount);
+   track.onended = onAudioLost;
+   ctx.onstatechange = () => { if (ctx.state === 'suspended') ctx.resume().catch(() => {}); };
+   audio.state = 'live';
+   audio.retries = 0;
+   setBassUi('live');
+   return true;
+  } catch (error) {
+   console.warn('System audio capture unavailable:', error);
+   stopAudio();
+   setBassUi('unavailable');
+   return false;
+  } finally { audio.starting = null; }
+ })();
+ return audio.starting;
+}
+window.addEventListener('pointerdown', () => {
+ if (audio.state !== 'live' && !audio.starting && !audio.gestureTried) { audio.gestureTried = true; startAudio(); }
+}, { passive: true });
+window.addEventListener('beforeunload', stopAudio);
+
+const agc = { init: false, hi: 0, lo: 0 };
+function sampleBass(dt) {
+ if (audio.state !== 'live' || !audio.analyser || !state.playing) { agc.init = false; return 0; }
+ audio.analyser.getByteFrequencyData(audio.data);
+ const hzPerBin = audio.ctx.sampleRate / audio.analyser.fftSize;
  const low = Math.max(1, Math.floor(35 / hzPerBin));
- const high = Math.min(audioData.length - 1, Math.ceil(170 / hzPerBin));
+ const high = Math.min(audio.data.length - 1, Math.ceil(170 / hzPerBin));
  let sum = 0, peak = 0, count = 0;
- for (let i = low; i <= high; i++) { const value = audioData[i] / 255; sum += value; peak = Math.max(peak, value); count++; }
- const average = count ? sum / count : 0;
- bassTarget = Math.max(0, Math.min(1, (average * .7 + peak * .3 - .035) * 2.8));
+ for (let i = low; i <= high; i++) { const v = audio.data[i] / 255; sum += v; if (v > peak) peak = v; count++; }
+ const raw = count ? (sum / count) * .65 + peak * .35 : 0;
+ if (!agc.init) { agc.hi = raw; agc.lo = raw; agc.init = true; }
+ agc.hi = Math.max(raw, agc.hi - dt * .06);
+ agc.lo = Math.min(raw, agc.lo + dt * .04);
+ if (raw < .05) return 0;
+ const n = clamp((raw - agc.lo) / Math.max(.14, agc.hi - agc.lo), 0, 1);
+ return n * n;
 }
-const canvas = $('aurora'), ctx = canvas.getContext('2d');
-function draw() {
- const rect = canvas.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
- if (canvas.width !== Math.round(rect.width * dpr) || canvas.height !== Math.round(rect.height * dpr)) {
-  canvas.width = Math.round(rect.width * dpr); canvas.height = Math.round(rect.height * dpr);
+
+/* ---------- Жидкая анимация ---------- */
+const aurora = (() => {
+ const canvas = $('aurora'), ctx = canvas.getContext('2d');
+ const SCALE = .5, POINTS = 48;
+ const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const blobs = [
+  { fx: -.10, fy: .02, rx: .36, ry: .30, seed: .2, sx: .21, sy: .17, k: .13, c: ['rgba(255,170,200,.36)', 'rgba(222,86,168,.28)', 'rgba(145,70,190,0)'] },
+  { fx: .16, fy: -.045, rx: .28, ry: .26, seed: 2.4, sx: .17, sy: .23, k: .17, c: ['rgba(255,208,226,.24)', 'rgba(178,91,205,.24)', 'rgba(80,98,214,0)'] },
+  { fx: -.01, fy: .10, rx: .22, ry: .20, seed: 4.1, sx: .26, sy: .19, k: .22, c: ['rgba(255,153,191,.24)', 'rgba(207,96,174,.22)', 'rgba(120,65,196,0)'] },
+  { fx: .05, fy: -.12, rx: .20, ry: .17, seed: 5.6, sx: .15, sy: .24, k: .20, c: ['rgba(190,150,255,.22)', 'rgba(140,84,214,.20)', 'rgba(90,60,200,0)'] }
+ ];
+ let w = 1, h = 1, raf = 0, last = 0, t = 0, level = 0;
+ function resize() {
+  const r = canvas.getBoundingClientRect();
+  const nw = Math.max(1, Math.round(r.width * SCALE)), nh = Math.max(1, Math.round(r.height * SCALE));
+  if (canvas.width !== nw) canvas.width = nw;
+  if (canvas.height !== nh) canvas.height = nh;
+  w = nw; h = nh;
  }
- ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, rect.width, rect.height);
- phase += .009; sampleBass(); bassLevel += (bassTarget - bassLevel) * (bassTarget > bassLevel ? .32 : .1);
- const w = rect.width, h = rect.height, cx = w * .5, cy = h * .48, min = Math.min(w, h);
- ctx.save(); ctx.globalCompositeOperation = 'screen';
- const glow = ctx.createRadialGradient(cx, cy, min * .02, cx, cy, Math.max(w, h) * .68);
- glow.addColorStop(0, 'rgba(231,143,177,' + (.12 + bassLevel * .34) + ')');
- glow.addColorStop(.38, 'rgba(188,89,180,' + (.09 + bassLevel * .2) + ')');
- glow.addColorStop(.72, 'rgba(85,65,190,' + (.045 + bassLevel * .1) + ')');
- glow.addColorStop(1, 'rgba(12,0,20,0)');
- ctx.fillStyle = glow; ctx.fillRect(0, 0, w, h);
- function liquidBlob(x, y, rx, ry, offset, colors, alpha) {
-  ctx.save(); ctx.translate(x, y); ctx.rotate(Math.sin(phase * .34 + offset) * .1); ctx.beginPath();
-  const points = 120, scale = 1 + bassLevel * (.055 + offset * .012);
-  for (let i = 0; i <= points; i++) {
-   const angle = i / points * Math.PI * 2;
-   const wave = Math.sin(angle * 3 + phase * 1.05 + offset) * (.045 + bassLevel * .09)
-    + Math.sin(angle * 5 - phase * .8 + offset * 2) * (.025 + bassLevel * .055)
-    + Math.cos(angle * 2 + phase * .6 - offset) * (.022 + bassLevel * .04)
-    + Math.sin(angle * 7 - phase * 1.8 + offset) * bassLevel * .03;
-   const px = Math.cos(angle) * rx * scale * (1 + wave), py = Math.sin(angle) * ry * scale * (1 + wave);
+ function drawBlob(b) {
+  const cx = w * (.5 + b.fx) + Math.sin(t * b.sx + b.seed) * w * .06;
+  const cy = h * (.48 + b.fy) + Math.cos(t * b.sy + b.seed * 1.7) * h * .05;
+  const rx = w * b.rx * (1 + level * b.k), ry = h * b.ry * (1 + level * b.k);
+  const amp1 = .05 + level * .09, amp2 = .03 + level * .05;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(Math.sin(t * .34 + b.seed) * .1);
+  ctx.beginPath();
+  for (let i = 0; i <= POINTS; i++) {
+   const a = i / POINTS * Math.PI * 2;
+   const wave = Math.sin(a * 3 + t * 1.0 + b.seed) * amp1 + Math.sin(a * 5 - t * .8 + b.seed * 2) * amp2 + Math.cos(a * 2 + t * .6 - b.seed) * .025;
+   const px = Math.cos(a) * rx * (1 + wave), py = Math.sin(a) * ry * (1 + wave);
    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
   }
   ctx.closePath();
-  const gradient = ctx.createLinearGradient(-rx, -ry, rx, ry);
-  gradient.addColorStop(0, colors[0]); gradient.addColorStop(.48, colors[1]); gradient.addColorStop(1, colors[2]);
-  ctx.fillStyle = gradient; ctx.shadowColor = colors[1]; ctx.shadowBlur = 34 + bassLevel * 78; ctx.globalAlpha = alpha; ctx.fill();
-  ctx.globalAlpha = alpha * .7; ctx.shadowBlur = 0; ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,220,239,.09)'; ctx.stroke();
+  const g = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(rx, ry) * 1.1);
+  g.addColorStop(0, b.c[0]); g.addColorStop(.58, b.c[1]); g.addColorStop(1, b.c[2]);
+  ctx.fillStyle = g;
+  ctx.fill();
   ctx.restore();
  }
- const pulse = 1 + bassLevel * .09;
- liquidBlob(cx - w * .10, cy + h * .02, Math.min(w * .38, 205) * pulse, Math.min(h * .32, 130) * pulse, .2, ['rgba(255,168,190,.23)', 'rgba(222,90,163,.29)', 'rgba(145,70,190,.17)'], .94);
- liquidBlob(cx + w * .16, cy - h * .045, Math.min(w * .30, 162) * (1 + bassLevel * .13), Math.min(h * .27, 112) * (1 + bassLevel * .13), 2.4, ['rgba(255,205,224,.15)', 'rgba(178,91,205,.22)', 'rgba(80,98,214,.13)'], .78);
- liquidBlob(cx - w * .01, cy + h * .10, Math.min(w * .24, 130) * (1 + bassLevel * .17), Math.min(h * .21, 88) * (1 + bassLevel * .17), 4.1, ['rgba(255,153,191,.14)', 'rgba(207,96,174,.2)', 'rgba(120,65,196,.13)'], .64);
- ctx.restore();
- canvas.style.opacity = String(.82 + bassLevel * .16);
- requestAnimationFrame(draw);
-}
-window.addEventListener('resize', () => { canvas.style.width = '100%'; canvas.style.height = '100%'; });
-draw(); startBassCapture(); update();
+ function frame(now) {
+  raf = 0;
+  if (document.hidden) return;
+  const interval = state.playing ? 0 : 40;
+  if (now - last < interval) { raf = requestAnimationFrame(frame); return; }
+  const dt = Math.min(.1, Math.max(.001, (now - last) / 1000));
+  last = now;
+  const target = sampleBass(dt);
+  level += (target - level) * (1 - Math.pow(1 - (target > level ? .38 : .09), dt * 60));
+  t += dt * (state.playing ? 1 : .55) * (reduce ? .3 : 1);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  ctx.globalCompositeOperation = 'screen';
+  ctx.globalAlpha = state.playing ? 1 : .7;
+  const cx = w * .5, cy = h * .48;
+  const glow = ctx.createRadialGradient(cx, cy, Math.min(w, h) * .02, cx, cy, Math.max(w, h) * .68);
+  glow.addColorStop(0, 'rgba(231,143,177,' + (.12 + level * .32) + ')');
+  glow.addColorStop(.4, 'rgba(188,89,180,' + (.08 + level * .18) + ')');
+  glow.addColorStop(.75, 'rgba(85,65,190,' + (.04 + level * .09) + ')');
+  glow.addColorStop(1, 'rgba(12,0,20,0)');
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, w, h);
+  for (const b of blobs) drawBlob(b);
+  raf = requestAnimationFrame(frame);
+ }
+ function start() { if (!raf && !document.hidden) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+ function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+ if (typeof ResizeObserver === 'function') new ResizeObserver(resize).observe(canvas);
+ else window.addEventListener('resize', resize);
+ resize();
+ return { start, stop };
+})();
+
+document.addEventListener('visibilitychange', () => {
+ if (document.hidden) aurora.stop(); else { aurora.start(); update(); }
+});
+
+aurora.start();
+startAudio();
+update();
 setInterval(update, 1800);
-setInterval(() => { if (!seeking) renderProgress(currentPosition()); }, 100);
+setInterval(() => { if (!state.dragging && !document.hidden) renderProgress(currentPosition()); }, 200);
 </script>
 </body>
 </html>
