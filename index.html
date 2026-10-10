@@ -114,7 +114,7 @@ const grip=$('resizeGrip');let resizing=false,startX=0,startY=0,startW=0,startH=
      video:{mandatory:{chromeMediaSource:'desktop',chromeMediaSourceId:sourceInfo.sourceId}}
    });
    stream.getVideoTracks().forEach(track=>track.stop());
-   audioContext=new AudioContext();
+   audioContext=new AudioContext();if(audioContext.state==='suspended')await audioContext.resume();
    const source=audioContext.createMediaStreamSource(stream);
    audioAnalyser=audioContext.createAnalyser();
    audioAnalyser.fftSize=2048;
