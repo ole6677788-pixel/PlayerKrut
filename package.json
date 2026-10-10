@@ -1,0 +1,8 @@
+{
+  "name": "playerkrut",
+  "version": "1.0.0",
+  "description": "Compact animated Windows now-playing mini player",
+  "main": "main.js",
+  "scripts": { "start": "electron ." },
+  "devDependencies": { "electron": "^38.2.0" }
+}
