@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PlayerKrut · 1.7.0</title>
 <style>
+/* v1.10.0 — responsive Yandex Music-inspired layout */
 :root{--accent:#D98383;--accent2:#f0a4a4;--bg:#171719;--panel:#202022;--muted:#aaa7a7;--line:#ffffff14}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent;color:#f7f4f4;font-family:Inter,"Segoe UI",Arial,sans-serif;user-select:none}body{padding:7px}
 .shell{--cover-image:none;position:relative;width:100%;height:100%;overflow:hidden;border-radius:20px;border:1px solid #ffffff16;background:linear-gradient(145deg,#252426f0,#181719e8 72%);box-shadow:0 18px 48px #0009,inset 0 1px #ffffff09;display:flex;flex-direction:column;padding:14px 15px 10px;backdrop-filter:blur(22px);isolation:isolate}
@@ -11,7 +12,7 @@
 .controls{display:flex;align-items:center;justify-content:center;gap:13px;flex-shrink:0;margin:11px 0 10px}.ctrl{width:35px;height:35px;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;color:#e7e1e1;cursor:pointer;font-size:17px;transition:transform .15s,background .15s}.ctrl:hover{transform:scale(1.08);background:#ffffff12}.ctrl.main{width:45px;height:45px;background:var(--accent);color:#211a1a;box-shadow:0 5px 18px #D9838338;font-size:19px}.ctrl.main:hover{background:#e69a9a}.ctrl.open{width:auto;height:30px;padding:0 11px;border:1px solid #ffffff18;border-radius:15px;font-size:10px;font-weight:650;color:#d9caca;margin-left:3px}
 .footer{display:flex;align-items:center;gap:8px;flex-shrink:0;padding-top:8px;border-top:1px solid var(--line)}.bars{height:15px;width:27px;display:flex;align-items:center;justify-content:center;gap:2px}.bars i{width:3px;height:4px;border-radius:4px;background:var(--accent);animation:bar .65s ease-in-out infinite alternate}.bars i:nth-child(2){animation-delay:-.35s}.bars i:nth-child(3){animation-delay:-.1s}.bars i:nth-child(4){animation-delay:-.5s}.bars i:nth-child(5){animation-delay:-.25s}@keyframes bar{to{height:13px}}.shell.idle .bars i{animation-play-state:paused;height:3px;opacity:.45}.status{flex:1;font-size:9px;letter-spacing:.7px;color:#aaa2a2}.source{max-width:40%;font-size:9px;color:#c9a0a0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}.changelog{position:absolute;inset:0;z-index:30;display:none;align-items:center;justify-content:center;padding:15px;background:#100e0ed9;backdrop-filter:blur(16px);border-radius:20px}.changelog.open{display:flex}.change-card{width:100%;max-width:390px;border:1px solid #ffffff16;background:linear-gradient(145deg,#302729f5,#1c1a1cf7);border-radius:17px;padding:17px;box-shadow:0 15px 40px #0007}.change-head{display:flex;align-items:center;justify-content:space-between}.change-kicker{font-size:9px;letter-spacing:2px;color:#D98383;font-weight:800}.change-title{font-size:23px;font-weight:800;margin-top:4px}.change-version{font-size:11px;color:#DFA0A0;margin:10px 0 14px}.change-item{display:flex;flex-direction:column;gap:4px;padding:10px 0;border-top:1px solid #ffffff12}.change-item b{font-size:12px}.change-item span{font-size:11px;line-height:1.45;color:#bdb4b4}.change-done{margin-top:9px;width:100%;border:0;border-radius:11px;background:#D98383;color:#241b1b;font-weight:750;padding:10px;cursor:pointer}.resize-grip{position:absolute;right:1px;bottom:1px;width:20px;height:20px;z-index:20;cursor:nwse-resize;touch-action:none;background:linear-gradient(135deg,transparent 0 43%,#D9838355 44% 50%,transparent 51% 62%,#D98383bb 63% 69%,transparent 70%);border-radius:0 0 12px 0}.shell.idle .orb-wrap{filter:saturate(.7);opacity:.9}@keyframes cloud{to{transform:scale(1.15);opacity:.55}}@keyframes coverbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.012)}}@media(max-height:340px){.stage{padding:4px 2px;gap:7px}.cover-scene{width:min(25%,88px)}.controls{margin:3px 0 5px}.shell{padding:8px 12px}.footer{padding-top:4px}}@media(max-width:390px){.stage{gap:9px}.cover-scene{width:min(38%,135px)}.track-info .title{font-size:18px}.track-info .artist{font-size:12px}.shell{padding:11px 12px 9px}}
 
-/* v1.9.0 — Yandex Music-inspired compact layout */
+/* v1.10.0 — Yandex Music-inspired compact layout */
 :root{--accent:#D98383;--accent2:#f6b1b1}
 body{padding:0;background:#090809}
 .shell{border:0;border-radius:18px;background:#090809e8;box-shadow:none;padding:12px 15px 10px}
@@ -90,19 +91,74 @@ body{background:#030303}
 @media(max-height:390px){.shell{padding:6px 10px}.stage{gap:5px}.cover-scene{width:min(33%,100px)}.controls{margin:2px 0;gap:13px}.ctrl.main{width:36px;height:36px}.title{padding:5px 16px}}
 
 
-/* v1.9.0: full-width title timeline and richer audio-reactive liquid ARGB */
+/* v1.10.0: full-width title timeline and richer audio-reactive liquid ARGB */
 .title{display:block;width:min(100%,340px);max-width:90%;min-width:0;margin:0 auto;padding:9px 18px;text-align:center;cursor:pointer;user-select:none;touch-action:pan-y;box-shadow:0 0 22px #d997a328,inset 0 1px #ffffff30,0 5px 22px #0002}
 .title:active{filter:brightness(1.12)}
 .seekslider{background:linear-gradient(90deg,#d997a3 0%,#d997a3 var(--seek-progress,0%),#ffffff35 var(--seek-progress,0%),#ffffff35 100%)}
 
+
+/* v1.10.0 responsive cleanup: one layout source of truth */
+html,body{min-width:0;min-height:0}
+body{padding:0}
+.shell{width:100%;height:100%;min-width:0;min-height:0;padding:clamp(7px,2.2vh,12px) clamp(9px,3vw,15px) clamp(6px,1.7vh,10px);border-radius:16px}
+.top{flex:0 0 auto;min-width:0;gap:8px}
+.brand{flex:0 0 auto}
+.actions{min-width:0;gap:4px}
+.version{padding:4px 6px;font-size:9px;white-space:nowrap}
+.winbtn{flex:0 0 auto;width:clamp(22px,6vw,25px);height:clamp(22px,6vw,25px)}
+.stage{flex:1 1 auto;min-height:0;min-width:0;gap:clamp(4px,1.4vh,10px);padding:clamp(2px,1vh,7px) 0;overflow:hidden}
+.cover-scene{width:min(40%,30vh,150px);max-width:48%;min-width:58px;max-height:100%;aspect-ratio:1;flex:0 1 auto}
+.cover-cloud{inset:-26%;filter:blur(clamp(14px,4vh,28px));opacity:.8}
+.orb-wrap,.orb{min-width:0;min-height:0}
+.orb,.orb img{border-radius:clamp(9px,2vw,15px)}
+.track-info{width:min(100%,360px);max-width:100%;min-width:0;flex:0 1 auto;overflow:hidden;padding:0 clamp(2px,2vw,10px);text-align:center}
+.title{display:block;width:100%;max-width:100%;min-width:0;margin:0 auto;padding:clamp(5px,1.6vh,9px) clamp(10px,3vw,18px);font-size:clamp(12px,4vw,18px);line-height:1.18;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal;letter-spacing:-.2px}
+.artist{display:block;width:100%;max-width:100%;min-width:0;margin-top:clamp(3px,.8vh,5px);font-size:clamp(10px,2.9vw,12px);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.album{display:none}
+.seekrow{flex:0 0 auto;width:100%;min-width:0;gap:clamp(4px,1.5vw,7px);margin:0}
+.time{flex:0 0 28px;min-width:28px;font-size:9px;text-align:center}
+.seekslider{width:100%;min-width:0;flex:1 1 auto}
+.controls{flex:0 0 auto;gap:clamp(12px,5vw,20px);margin:clamp(4px,1.5vh,8px) 0 clamp(2px,1vh,5px)}
+.ctrl{flex:0 0 auto}
+.ctrl.main{width:clamp(34px,11vh,44px);height:clamp(34px,11vh,44px)}
+.footer{flex:0 0 auto;min-width:0;padding-top:4px;border-top:1px solid #ffffff0a}
+.footer .status{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.source{max-width:45%;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bars,#progress{display:none!important}
+#aurora{opacity:.82;mix-blend-mode:screen}
+.cover-cloud{background:radial-gradient(ellipse at 50% 50%,#d997a345 0%,#b25dc52a 36%,transparent 72%)}
+.orb-wrap.playing .orb{animation:coverbeat 3.4s ease-in-out infinite}
+.resize-grip{width:15px;height:15px;opacity:.5}
+@media(max-height:300px){
+ .shell{padding:5px 9px 4px}
+ .top{min-height:20px}
+ .stage{flex-direction:row;justify-content:flex-start;gap:10px;padding:2px 0}
+ .cover-scene{width:min(26vh,82px);min-width:50px;max-width:34%;flex:0 0 auto}
+ .track-info{flex:1 1 auto;text-align:left;padding:0;min-width:0}
+ .title{text-align:left;font-size:clamp(11px,3vw,15px);padding:5px 9px}
+ .artist{text-align:left}
+ .controls{margin:2px 0;gap:12px}
+ .ctrl.main{width:32px;height:32px}
+ .footer{padding-top:2px}
+}
+@media(max-width:330px){
+ .brand{font-size:8px;letter-spacing:.7px}
+ .actions{gap:2px}
+ .version{padding:3px 4px;font-size:8px}
+ .top .winbtn{width:21px;height:21px}
+ .stage{gap:5px}
+ .cover-scene{width:min(38%,27vh,108px);min-width:54px}
+ .controls{gap:12px}
+}
+
 </style></head><body><div class="shell idle" id="shell"><canvas id="aurora"></canvas><div class="glow"></div><div class="glow two"></div>
-<div class="top"><div class="brand">PLAYERKRUT<small>YOUR MUSIC • YOUR VIBE</small></div><div class="actions"><button class="version" id="version" title="Что нового">v1.9.0</button><button class="winbtn sizebtn" id="smaller" title="Уменьшить окно">−</button><button class="winbtn sizebtn" id="larger" title="Увеличить окно">+</button><button class="winbtn" id="pin" title="Поверх окон">⌖</button><button class="winbtn" id="min" title="Свернуть">—</button><button class="winbtn" id="close" title="Закрыть">×</button></div></div>
+<div class="top"><div class="brand">PLAYERKRUT<small>YOUR MUSIC • YOUR VIBE</small></div><div class="actions"><button class="version" id="version" title="Что нового">v1.10.0</button><button class="winbtn sizebtn" id="smaller" title="Уменьшить окно">−</button><button class="winbtn sizebtn" id="larger" title="Увеличить окно">+</button><button class="winbtn" id="pin" title="Поверх окон">⌖</button><button class="winbtn" id="min" title="Свернуть">—</button><button class="winbtn" id="close" title="Закрыть">×</button></div></div>
 <div class="stage"><div class="cover-scene"><div class="cover-cloud"></div><div class="orb-wrap" id="orbWrap"><div class="orb"><img id="art" alt="" style="display:none"></div></div></div><div class="track-info"><div class="playing-tag"><span class="dot"></span><span id="eyebrow">СЕЙЧАС ИГРАЕТ</span></div><div class="title" id="title">Ищем музыку…</div><div class="artist" id="artist">Запусти музыку в поддерживаемом приложении</div><div class="album" id="album"></div></div></div>
 <div class="seekrow"><span class="time" id="elapsed">0:00</span><input class="seekslider" id="seekslider" type="range" min="0" max="100" step="1" value="0" aria-label="Перемотка трека"><span class="time" id="duration">0:00</span></div><div class="controls"><button class="ctrl" id="previous" title="Предыдущий трек">⏮</button><button class="ctrl main" id="playpause" title="Пауза или воспроизведение">▶</button><button class="ctrl" id="next" title="Следующий трек">⏭</button><button class="ctrl open" id="openapp" title="Вернуться в приложение с музыкой">↗ Открыть</button></div>
-<div class="footer"><div class="bars"><i></i><i></i><i></i><i></i><i></i></div><div class="status" id="status">READY TO VIBE</div><div class="source" id="source">DESKTOP PLAYER</div></div><div class="seek" id="progress" style="width:0"></div><div class="changelog" id="changelog" aria-hidden="true"><div class="change-card"><div class="change-head"><div><div class="change-kicker">PLAYERKRUT</div><div class="change-title">Что нового</div></div><button class="winbtn" id="closeChanges">×</button></div><div class="change-version">Версия 1.9.0</div><div class="change-item"><b>Живая ARGB-анимация</b><span>Мягкие жидкие формы переливаются и реагируют на низкие частоты музыки.</span></div><div class="change-item"><b>Шкала трека исправлена</b><span>Плашка с названием показывает прогресс по всей ширине и позволяет перематывать трек нажатием.</span></div><div class="change-item"><b>Точнее перемотка</b><span>Нижний ползунок и плашка синхронно показывают текущую позицию.</span></div><button class="change-done" id="doneChanges">Понятно</button></div></div><div class="resize-grip" id="resizeGrip" title="Потяни, чтобы изменить размер"></div></div>
+<div class="footer"><div class="status" id="status">READY TO VIBE</div><div class="source" id="source">DESKTOP PLAYER</div></div><div class="changelog" id="changelog" aria-hidden="true"><div class="change-card"><div class="change-head"><div><div class="change-kicker">PLAYERKRUT</div><div class="change-title">Что нового</div></div><button class="winbtn" id="closeChanges">×</button></div><div class="change-version">Версия 1.10.0</div><div class="change-item"><b>Живая ARGB-анимация</b><span>Мягкие жидкие формы переливаются и реагируют на низкие частоты музыки.</span></div><div class="change-item"><b>Шкала трека исправлена</b><span>Плашка с названием показывает прогресс по всей ширине и позволяет перематывать трек нажатием.</span></div><div class="change-item"><b>Точнее перемотка</b><span>Нижний ползунок и плашка синхронно показывают текущую позицию.</span></div><button class="change-done" id="doneChanges">Понятно</button></div></div><div class="resize-grip" id="resizeGrip" title="Потяни, чтобы изменить размер"></div></div>
 <script>
 const $=id=>document.getElementById(id);let busy=false,anim=null,phase=0,seeking=false,basePosition=0,baseDuration=0,baseStamp=Date.now(),basePlaying=false;let bassLevel=0,bassTarget=0,audioAnalyser=null,audioData=null,audioContext=null;const fmt=s=>{s=Math.max(0,Math.floor(Number(s)||0));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
-async function update(){if(busy)return;busy=true;try{const d=await window.playerAPI.getNowPlaying();const has=!!(d&&d.title);$('shell').classList.toggle('idle',!d?.playing);$('orbWrap').classList.toggle('playing',!!d?.playing);$('title').textContent=has?d.title:'Ничего не играет';$('artist').textContent=has?(d.artist||'Неизвестный исполнитель'):(d?.error||'Запусти музыку — я покажу трек');$('album').textContent=has?(d.album||'') : ''; $('eyebrow').textContent=d?.playing?'NOW PLAYING':has?'PAUSED':'READY WHEN YOU ARE';$('status').textContent=d?.error?'MEDIA SESSION ERROR':d?.playing?'PLAYING • LIVE':has?'PAUSED • READY':'WAITING FOR MEDIA';$('source').textContent=has?(d.app||'DESKTOP').split('!')[0].split(/[.\\]/).pop().slice(0,24).toUpperCase():'DESKTOP PLAYER';$('progress').style.width=d?.playing?'100%':'0%';$('playpause').textContent=d?.playing?'Ⅱ':'▶';const pos=Number(d?.position)||0,dur=Number(d?.duration)||0;const progressPct=dur>0?Math.max(0,Math.min(100,pos/dur*100)):0;$('title').style.setProperty('--track-progress',`${progressPct}%`);$('seekslider').style.setProperty('--seek-progress',`${progressPct}%`);$('title').setAttribute('aria-valuenow',String(Math.floor(pos)));$('title').setAttribute('aria-valuemax',String(Math.floor(dur)));basePosition=pos;baseDuration=dur;baseStamp=Date.now();basePlaying=!!d?.playing;if(!seeking){$('seekslider').max=String(Math.max(1,dur));$('seekslider').value=String(Math.min(pos,dur||pos));}$('elapsed').textContent=fmt(pos);$('duration').textContent=fmt(dur);const art=$('art');if(d?.thumbnail){const src=d.thumbnail.startsWith('data:')?d.thumbnail:'data:'+(d.thumbnailType||'image/jpeg')+';base64,'+d.thumbnail;if(art.getAttribute('src')!==src){art.src=src;$('shell').style.setProperty('--cover-image','url("'+src+'")')}art.style.display='block';art.onerror=()=>{art.style.display='none'}}else{art.removeAttribute('src');art.style.display='none';$('shell').style.setProperty('--cover-image','none')}}catch(e){$('title').textContent='Музыка пока не найдена';$('artist').textContent='Windows: '+String(e?.message||'не удалось прочитать данные');}finally{busy=false}}
+async function update(){if(busy)return;busy=true;try{const d=await window.playerAPI.getNowPlaying();const has=!!(d&&d.title);$('shell').classList.toggle('idle',!d?.playing);$('orbWrap').classList.toggle('playing',!!d?.playing);$('title').textContent=has?d.title:'Ничего не играет';$('artist').textContent=has?(d.artist||'Неизвестный исполнитель'):(d?.error||'Запусти музыку — я покажу трек');$('album').textContent=has?(d.album||'') : ''; $('eyebrow').textContent=d?.playing?'NOW PLAYING':has?'PAUSED':'READY WHEN YOU ARE';$('status').textContent=d?.error?'MEDIA SESSION ERROR':d?.playing?'PLAYING • LIVE':has?'PAUSED • READY':'WAITING FOR MEDIA';$('source').textContent=has?(d.app||'DESKTOP').split('!')[0].split(/[.\\]/).pop().slice(0,24).toUpperCase():'DESKTOP PLAYER';$('progress').style.width=d?.playing?'100%':'0%';$('playpause').textContent=d?.playing?'Ⅱ':'▶';const pos=Number(d?.position)||0,dur=Number(d?.duration)||0;const progressPct=dur>0?Math.max(0,Math.min(100,pos/dur*100)):0;$('title').style.setProperty('--track-progress',`${progressPct}%`);$('seekslider').style.setProperty('--seek-progress',`${progressPct}%`);$('title').setAttribute('aria-valuenow',String(Math.floor(pos)));$('title').setAttribute('aria-valuemax',String(Math.floor(dur)));basePosition=pos;baseDuration=dur;baseStamp=Date.now();basePlaying=!!d?.playing;if(!seeking){$('seekslider').max=String(Math.max(1,dur));$('seekslider').value=String(Math.min(pos,dur||pos));}$('elapsed').textContent=fmt(pos);$('duration').textContent=fmt(dur);const art=$('art');if(d?.thumbnail){const src=d.thumbnail.startsWith('data:')?d.thumbnail:'data:'+(d.thumbnailType||'image/jpeg')+';base64,'+d.thumbnail;if(art.getAttribute('src')!==src){art.src=src;$('shell').style.setProperty('--cover-image','url("'+src+'")')}art.style.display='block';art.onerror=()=>{art.style.display='none';$('shell').style.setProperty('--cover-image','none')}}else{art.removeAttribute('src');art.style.display='none';$('shell').style.setProperty('--cover-image','none')}}catch(e){$('title').textContent='Музыка пока не найдена';$('artist').textContent='Windows: '+String(e?.message||'не удалось прочитать данные');}finally{busy=false}}
 async function control(action){await window.playerAPI.control(action);setTimeout(update,450)}const changelog=$('changelog');function toggleChanges(open){changelog.classList.toggle('open',open);changelog.setAttribute('aria-hidden',String(!open))}$('version').onclick=()=>toggleChanges(true);$('closeChanges').onclick=()=>toggleChanges(false);$('doneChanges').onclick=()=>toggleChanges(false);$('seekslider').addEventListener('input',()=>{seeking=true;const p=Number($('seekslider').value)||0;$('elapsed').textContent=fmt(p);const pct=baseDuration>0?Math.max(0,Math.min(100,p/baseDuration*100)):0;$('title').style.setProperty('--track-progress',`${pct}%`);$('seekslider').style.setProperty('--seek-progress',`${pct}%`)});$('title').addEventListener('click',async e=>{if(!baseDuration)return;const r=$('title').getBoundingClientRect();const pct=Math.max(0,Math.min(1,(e.clientX-r.left)/Math.max(1,r.width)));const target=Math.round(baseDuration*pct);seeking=true;basePosition=target;baseStamp=Date.now();$('elapsed').textContent=fmt(target);$('title').style.setProperty('--track-progress',`${pct*100}%`);$('seekslider').style.setProperty('--seek-progress',`${pct*100}%`);$('seekslider').value=String(target);try{await window.playerAPI.control('seek',target)}finally{seeking=false;setTimeout(update,350)}});$('seekslider').addEventListener('change',async()=>{await window.playerAPI.control('seek',Number($('seekslider').value));seeking=false;setTimeout(update,500)});
 $('previous').onclick=()=>control('previous');$('playpause').onclick=()=>control('playpause');$('next').onclick=()=>control('next');$('openapp').onclick=async()=>{const r=await window.playerAPI.openSourceApp();$('openapp').textContent=r?.ok?'✓ Открыто':'Не найдено';setTimeout(()=>$('openapp').textContent='↗ Открыть',1800)};$('close').onclick=()=>window.playerAPI.close();$('min').onclick=()=>window.playerAPI.minimize();$('pin').onclick=()=>window.playerAPI.togglePin()
 const grip=$('resizeGrip');let resizing=false,startX=0,startY=0,startW=0,startH=0,lastResize=0,resizeFrame=0;async function changeSize(dw,dh){const s=await window.playerAPI.getWindowSize();window.playerAPI.resizeTo(Math.max(280,Math.min(760,s.width+dw)),Math.max(210,Math.min(620,s.height+dh)))}$('smaller').onclick=()=>changeSize(-48,-32);$('larger').onclick=()=>changeSize(48,32);grip.addEventListener('pointerdown',e=>{resizing=true;startX=e.screenX;startY=e.screenY;const box=$('shell').getBoundingClientRect();startW=box.width+16;startH=box.height+16;try{grip.setPointerCapture(e.pointerId)}catch{}e.preventDefault();e.stopPropagation()});grip.addEventListener('pointermove',e=>{if(!resizing)return;const w=Math.max(340,Math.min(760,startW+e.screenX-startX));const h=Math.max(250,Math.min(620,startH+e.screenY-startY));cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>window.playerAPI.resizeTo(w,h))});const stopResize=()=>{resizing=false};grip.addEventListener('pointerup',stopResize);grip.addEventListener('pointercancel',stopResize);async function startBassCapture(){
@@ -143,7 +199,7 @@ const canvas=$('aurora'),ctx=canvas.getContext('2d');function draw(){
  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,rect.width,rect.height);
  phase+=.012;sampleBass();bassLevel+=(bassTarget-bassLevel)*(bassTarget>bassLevel?.42:.12);
  const hue=(phase*9+bassLevel*28)%360;
- canvas.style.filter=`hue-rotate(${hue}deg) saturate(${1.2+bassLevel*1.15}) brightness(${.92+bassLevel*.18})`;
+ canvas.style.filter=`hue-rotate(${hue}deg) saturate(${1.05+bassLevel*.8}) brightness(${.88+bassLevel*.22}) blur(.4px)`;
  const w=rect.width,h=rect.height,cx=w*.5,cy=h*.47,min=Math.min(w,h);
  ctx.save();ctx.globalCompositeOperation='screen';
  const glow=ctx.createRadialGradient(cx,cy,min*.025,cx,cy,Math.max(w,h)*.62);
@@ -168,8 +224,8 @@ const canvas=$('aurora'),ctx=canvas.getContext('2d');function draw(){
    ctx.closePath();
    const grad=ctx.createLinearGradient(-rx,-ry,rx,ry);
    grad.addColorStop(0,palette[0]);grad.addColorStop(.43,palette[1]);grad.addColorStop(1,palette[2]);
-   ctx.fillStyle=grad;ctx.shadowColor=palette[1];ctx.shadowBlur=30+bassLevel*78;ctx.globalAlpha=alpha;ctx.fill();
-   ctx.globalAlpha=Math.min(1,alpha+.12);ctx.shadowBlur=0;ctx.lineWidth=1;ctx.strokeStyle='rgba(255,215,238,.24)';ctx.stroke();
+   ctx.fillStyle=grad;ctx.shadowColor=palette[1];ctx.shadowBlur=44+bassLevel*92;ctx.globalAlpha=alpha;ctx.fill();
+   ctx.globalAlpha=Math.min(1,alpha+.12);ctx.shadowBlur=0;ctx.lineWidth=1;ctx.strokeStyle='rgba(255,215,238,.07)';ctx.stroke();
    ctx.restore();
  }
  const pulse=1+bassLevel*.1;
