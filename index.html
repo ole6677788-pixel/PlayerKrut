@@ -51,6 +51,44 @@ body{padding:0;background:#090809}
 .resize-grip{background:linear-gradient(135deg,transparent 0 43%,#ffffff30 44% 50%,transparent 51% 62%,#D9838399 63% 69%,transparent 70%)}
 @media(max-height:390px){.stage{gap:5px}.cover-scene{width:min(30%,110px)}.controls{margin:3px 0 4px;gap:13px}.ctrl.main{width:40px;height:40px}.shell{padding:7px 12px}.footer{padding-top:3px}}
 
+
+/* Original compact reference: animated red liquid ARGB backdrop */
+body{background:#030303}
+.shell{background:#030303;border-radius:16px;padding:10px 12px 8px;isolation:isolate}
+#aurora{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:1}
+.shell:before{inset:0;background-image:linear-gradient(180deg,#0000 30%,#03030340 62%,#030303 100%),var(--cover-image);filter:blur(32px) saturate(1.35);opacity:.26;transform:scale(1.15);z-index:0}
+.shell>*:not(#aurora){position:relative;z-index:1}
+.glow,.glow.two{display:none}
+.top{min-height:22px}
+.brand{font-size:9px;letter-spacing:1.2px;color:#ffffffa0}
+.brand small{display:none}
+.stage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:2px 0 0;flex:1;min-height:0}
+.cover-scene{width:150px;max-width:48%;aspect-ratio:1;max-height:none;flex:none;margin:0 auto;position:relative}
+.cover-cloud{inset:-32%;background:radial-gradient(circle,#ff233c70,transparent 68%);filter:blur(24px);opacity:.9;animation:cloudpulse 4s ease-in-out infinite alternate}
+.orb-wrap{width:100%;height:100%;display:grid;place-items:center}
+.orb{width:100%;height:100%;border-radius:15px;overflow:hidden;box-shadow:0 9px 26px #0009,0 0 0 1px #ffffff25}
+.orb img{width:100%;height:100%;object-fit:cover;border-radius:15px}
+.track-info{width:100%;text-align:center;padding:0 16px;min-width:0}
+.playing-tag{display:none}
+.title{display:inline-block;max-width:90%;font-size:clamp(13px,3vw,18px);line-height:1.3;font-weight:750;letter-spacing:0;padding:7px 22px;border-radius:30px;background:rgba(217,131,131,.83);color:#fff;text-shadow:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.artist{font-size:11px;color:#ffffffc5;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.album{display:none}
+.seekrow{width:100%;gap:6px;margin-top:3px}
+.time{font-size:9px;color:#ffffffa0;min-width:25px}
+.seekslider{height:3px;background:#ffffff35}
+.seekslider::-webkit-slider-thumb{width:8px;height:8px;background:#fff;border:0;box-shadow:0 0 0 2px #D9838340}
+.controls{display:flex;align-items:center;justify-content:center;gap:17px;margin:6px 0 4px}
+.ctrl{width:25px;height:27px;background:transparent;border:0;border-radius:50%;color:#ffffffc9;font-size:16px}
+.ctrl:hover{background:#ffffff18}
+.ctrl.main{width:42px;height:42px;background:rgba(217,131,131,.48);color:#fff;box-shadow:0 0 20px #d9838330;font-size:18px}
+.ctrl.open{display:none}
+.footer{padding-top:4px;border-top:1px solid #ffffff0a}
+.status{font-size:8px;color:#ffffff72}
+.source{font-size:8px;color:#ffffff55}
+.resize-grip{z-index:8!important}
+@keyframes cloudpulse{from{transform:scale(.92);opacity:.65}to{transform:scale(1.12);opacity:1}}
+@media(max-height:390px){.shell{padding:6px 10px}.stage{gap:5px}.cover-scene{width:min(33%,100px)}.controls{margin:2px 0;gap:13px}.ctrl.main{width:36px;height:36px}.title{padding:5px 16px}}
+
 </style></head><body><div class="shell idle" id="shell"><canvas id="aurora"></canvas><div class="glow"></div><div class="glow two"></div>
 <div class="top"><div class="brand">PLAYERKRUT<small>YOUR MUSIC • YOUR VIBE</small></div><div class="actions"><button class="version" id="version" title="Что нового">v1.7.0</button><button class="winbtn sizebtn" id="smaller" title="Уменьшить окно">−</button><button class="winbtn sizebtn" id="larger" title="Увеличить окно">+</button><button class="winbtn" id="pin" title="Поверх окон">⌖</button><button class="winbtn" id="min" title="Свернуть">—</button><button class="winbtn" id="close" title="Закрыть">×</button></div></div>
 <div class="stage"><div class="cover-scene"><div class="cover-cloud"></div><div class="orb-wrap" id="orbWrap"><div class="orb"><img id="art" alt="" style="display:none"></div></div></div><div class="track-info"><div class="playing-tag"><span class="dot"></span><span id="eyebrow">СЕЙЧАС ИГРАЕТ</span></div><div class="title" id="title">Ищем музыку…</div><div class="artist" id="artist">Запусти музыку в поддерживаемом приложении</div><div class="album" id="album"></div></div></div>
@@ -61,5 +99,28 @@ const $=id=>document.getElementById(id);let busy=false,anim=null,phase=0,seeking
 async function update(){if(busy)return;busy=true;try{const d=await window.playerAPI.getNowPlaying();const has=!!(d&&d.title);$('shell').classList.toggle('idle',!d?.playing);$('orbWrap').classList.toggle('playing',!!d?.playing);$('title').textContent=has?d.title:'Ничего не играет';$('artist').textContent=has?(d.artist||'Неизвестный исполнитель'):(d?.error||'Запусти музыку — я покажу трек');$('album').textContent=has?(d.album||'') : ''; $('eyebrow').textContent=d?.playing?'NOW PLAYING':has?'PAUSED':'READY WHEN YOU ARE';$('status').textContent=d?.error?'MEDIA SESSION ERROR':d?.playing?'PLAYING • LIVE':has?'PAUSED • READY':'WAITING FOR MEDIA';$('source').textContent=has?(d.app||'DESKTOP').split('!')[0].split(/[.\\]/).pop().slice(0,24).toUpperCase():'DESKTOP PLAYER';$('progress').style.width=d?.playing?'100%':'0%';$('playpause').textContent=d?.playing?'Ⅱ':'▶';const pos=Number(d?.position)||0,dur=Number(d?.duration)||0;basePosition=pos;baseDuration=dur;baseStamp=Date.now();basePlaying=!!d?.playing;if(!seeking){$('seekslider').max=String(Math.max(1,dur));$('seekslider').value=String(Math.min(pos,dur||pos));}$('elapsed').textContent=fmt(pos);$('duration').textContent=fmt(dur);const art=$('art');if(d?.thumbnail){const src=d.thumbnail.startsWith('data:')?d.thumbnail:'data:'+(d.thumbnailType||'image/jpeg')+';base64,'+d.thumbnail;if(art.getAttribute('src')!==src){art.src=src;$('shell').style.setProperty('--cover-image','url("'+src+'")')}art.style.display='block';art.onerror=()=>{art.style.display='none'}}else{art.removeAttribute('src');art.style.display='none';$('shell').style.setProperty('--cover-image','none')}}catch(e){$('title').textContent='Музыка пока не найдена';$('artist').textContent='Windows: '+String(e?.message||'не удалось прочитать данные');}finally{busy=false}}
 async function control(action){await window.playerAPI.control(action);setTimeout(update,450)}const changelog=$('changelog');function toggleChanges(open){changelog.classList.toggle('open',open);changelog.setAttribute('aria-hidden',String(!open))}$('version').onclick=()=>toggleChanges(true);$('closeChanges').onclick=()=>toggleChanges(false);$('doneChanges').onclick=()=>toggleChanges(false);$('seekslider').addEventListener('input',()=>{seeking=true;$('elapsed').textContent=fmt($('seekslider').value)});$('seekslider').addEventListener('change',async()=>{await window.playerAPI.control('seek',Number($('seekslider').value));seeking=false;setTimeout(update,500)});
 $('previous').onclick=()=>control('previous');$('playpause').onclick=()=>control('playpause');$('next').onclick=()=>control('next');$('openapp').onclick=async()=>{const r=await window.playerAPI.openSourceApp();$('openapp').textContent=r?.ok?'✓ Открыто':'Не найдено';setTimeout(()=>$('openapp').textContent='↗ Открыть',1800)};$('close').onclick=()=>window.playerAPI.close();$('min').onclick=()=>window.playerAPI.minimize();$('pin').onclick=()=>window.playerAPI.togglePin()
-const grip=$('resizeGrip');let resizing=false,startX=0,startY=0,startW=0,startH=0,lastResize=0,resizeFrame=0;async function changeSize(dw,dh){const s=await window.playerAPI.getWindowSize();window.playerAPI.resizeTo(Math.max(280,Math.min(760,s.width+dw)),Math.max(210,Math.min(620,s.height+dh)))}$('smaller').onclick=()=>changeSize(-48,-32);$('larger').onclick=()=>changeSize(48,32);grip.addEventListener('pointerdown',e=>{resizing=true;startX=e.screenX;startY=e.screenY;const box=$('shell').getBoundingClientRect();startW=box.width+16;startH=box.height+16;try{grip.setPointerCapture(e.pointerId)}catch{}e.preventDefault();e.stopPropagation()});grip.addEventListener('pointermove',e=>{if(!resizing)return;const w=Math.max(340,Math.min(760,startW+e.screenX-startX));const h=Math.max(250,Math.min(620,startH+e.screenY-startY));cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>window.playerAPI.resizeTo(w,h))});const stopResize=()=>{resizing=false};grip.addEventListener('pointerup',stopResize);grip.addEventListener('pointercancel',stopResize);const canvas=$('aurora'),ctx=canvas.getContext('2d');function draw(){const rect=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);if(canvas.width!==Math.round(rect.width*dpr)||canvas.height!==Math.round(rect.height*dpr)){canvas.width=Math.round(rect.width*dpr);canvas.height=Math.round(rect.height*dpr)}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,rect.width,rect.height);phase+=0.018;const w=rect.width,h=rect.height;for(let k=0;k<3;k++){const cx=w*(.25+k*.25)+Math.sin(phase*(.8+k*.2)+k)*w*.12,cy=h*(.2+k*.26)+Math.cos(phase+k)*h*.1,r=Math.min(w,h)*(.22+k*.07);const g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,k===1?'rgba(153,95,255,.12)':'rgba(255,70,180,.11)');g.addColorStop(1,'rgba(80,50,150,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill()}if(!$('shell').classList.contains('idle')){for(let j=0;j<24;j++){const a=phase*.4+j*Math.PI*2/24,rad=Math.min(w,h)*(.24+Math.sin(phase*2+j*.7)*.025),x=w/2+Math.cos(a)*rad,y=h*.48+Math.sin(a)*rad*.7;ctx.fillStyle=j%2?'rgba(255,112,205,.5)':'rgba(167,125,255,.5)';ctx.beginPath();ctx.arc(x,y,1.1+Math.sin(phase*3+j)*.8,0,Math.PI*2);ctx.fill()}}anim=requestAnimationFrame(draw)}draw();update();setInterval(update,1800);setInterval(()=>{if(seeking)return;const p=Math.min(baseDuration,basePosition+(basePlaying?(Date.now()-baseStamp)/1000:0));$('elapsed').textContent=fmt(p);if(baseDuration>0)$('seekslider').value=String(Math.floor(p));},250);
+const grip=$('resizeGrip');let resizing=false,startX=0,startY=0,startW=0,startH=0,lastResize=0,resizeFrame=0;async function changeSize(dw,dh){const s=await window.playerAPI.getWindowSize();window.playerAPI.resizeTo(Math.max(280,Math.min(760,s.width+dw)),Math.max(210,Math.min(620,s.height+dh)))}$('smaller').onclick=()=>changeSize(-48,-32);$('larger').onclick=()=>changeSize(48,32);grip.addEventListener('pointerdown',e=>{resizing=true;startX=e.screenX;startY=e.screenY;const box=$('shell').getBoundingClientRect();startW=box.width+16;startH=box.height+16;try{grip.setPointerCapture(e.pointerId)}catch{}e.preventDefault();e.stopPropagation()});grip.addEventListener('pointermove',e=>{if(!resizing)return;const w=Math.max(340,Math.min(760,startW+e.screenX-startX));const h=Math.max(250,Math.min(620,startH+e.screenY-startY));cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>window.playerAPI.resizeTo(w,h))});const stopResize=()=>{resizing=false};grip.addEventListener('pointerup',stopResize);grip.addEventListener('pointercancel',stopResize);const canvas=$('aurora'),ctx=canvas.getContext('2d');function draw(){
+ const rect=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);
+ if(canvas.width!==Math.round(rect.width*dpr)||canvas.height!==Math.round(rect.height*dpr)){canvas.width=Math.round(rect.width*dpr);canvas.height=Math.round(rect.height*dpr)}
+ ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,rect.width,rect.height);phase+=0.012;
+ const w=rect.width,h=rect.height,cx=w*.5,cy=h*.46;
+ // Animated liquid ARGB blob, matching the original compact-player reference.
+ ctx.save();ctx.globalCompositeOperation='screen';
+ const glow=ctx.createRadialGradient(cx,cy,Math.min(w,h)*.04,cx,cy,Math.max(w,h)*.56);
+ glow.addColorStop(0,'rgba(255,28,48,.30)');glow.addColorStop(.55,'rgba(235,18,45,.18)');glow.addColorStop(1,'rgba(110,0,20,0)');
+ ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);
+ ctx.restore();
+ ctx.save();ctx.translate(cx,cy);ctx.beginPath();
+ const points=120,rx=Math.min(w*.44,215),ry=Math.min(h*.40,175);
+ for(let i=0;i<=points;i++){const a=i/points*Math.PI*2;const wave= Math.sin(a*3+phase*1.15)*.105+Math.sin(a*5-phase*.8)*.055+Math.cos(a*2+phase*.65)*.045;const pulse=1+wave;const x=Math.cos(a)*rx*pulse,y=Math.sin(a)*ry*pulse;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
+ ctx.closePath();
+ const blob=ctx.createLinearGradient(-rx,-ry,rx,ry);
+ blob.addColorStop(0,'rgba(255,30,48,.78)');blob.addColorStop(.38,'rgba(210,18,35,.72)');blob.addColorStop(.72,'rgba(154,12,31,.76)');blob.addColorStop(1,'rgba(255,64,83,.66)');
+ ctx.fillStyle=blob;ctx.shadowColor='#ff1638';ctx.shadowBlur=34;ctx.fill();
+ ctx.shadowBlur=0;ctx.lineWidth=1.2;ctx.strokeStyle='rgba(255,105,125,.24)';ctx.stroke();
+ // Slow-moving ARGB highlights travel over the blob.
+ for(let k=0;k<3;k++){const a=phase*(.65+k*.14)+k*2.1;const hx=Math.cos(a)*rx*.48,hy=Math.sin(a*1.1)*ry*.48;const rg=ctx.createRadialGradient(hx,hy,0,hx,hy,Math.min(w,h)*.28);rg.addColorStop(0,k===1?'rgba(255,90,135,.24)':'rgba(255,42,70,.28)');rg.addColorStop(1,'rgba(255,20,50,0)');ctx.fillStyle=rg;ctx.beginPath();ctx.arc(hx,hy,Math.min(w,h)*.28,0,Math.PI*2);ctx.fill()}
+ ctx.restore();
+ anim=requestAnimationFrame(draw)
+}draw();update();setInterval(update,1800);setInterval(()=>{if(seeking)return;const p=Math.min(baseDuration,basePosition+(basePlaying?(Date.now()-baseStamp)/1000:0));$('elapsed').textContent=fmt(p);if(baseDuration>0)$('seekslider').value=String(Math.floor(p));},250);
 </script></body></html>
