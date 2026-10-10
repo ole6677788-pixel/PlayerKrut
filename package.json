@@ -1,7 +1,7 @@
 {
   "name": "playerkrut",
-  "version": "1.8.0",
-  "description": "Compact animated red ARGB Windows music mini player with seeking and dynamic cover backdrop, changelog and reliable resizing",
+  "version": "1.9.0",
+  "description": "Compact Yandex Music-inspired Windows mini player with bass-reactive ARGB liquid visualizer, seekable title timeline and dynamic cover backdrop",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
