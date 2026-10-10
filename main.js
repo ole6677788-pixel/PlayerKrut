@@ -8,6 +8,7 @@ try {
  $null = [Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager, Windows.Media.Control, ContentType=WindowsRuntime]
  $methods = [System.WindowsRuntimeSystemExtensions].GetMethods() | Where-Object { $_.Name -eq 'AsTask' -and $_.GetParameters().Count -eq 1 -and $_.GetParameters()[0].ParameterType.Name -eq ('IAsyncOperation' + [char]96 + '1') }
  $asTask = $methods | Select-Object -First 1
+ function Wait-Async($operation) { $task = $asTask.MakeGenericMethod([bool]).Invoke($null, @($operation)); return $task.GetAwaiter().GetResult() }
  $op = [Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager]::RequestAsync()
  $task = $asTask.MakeGenericMethod([Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager]).Invoke($null, @($op))
  $manager = $task.GetAwaiter().GetResult()
@@ -63,10 +64,10 @@ try {
  $session = $manager.GetCurrentSession()
  if ($null -eq $session) { 'NO_SESSION'; exit }
  switch ('ACTION_PLACEHOLDER') {
-  'playpause' { $null = $session.TryTogglePlayPauseAsync() }
-  'next' { $null = $session.TrySkipNextAsync() }
-  'previous' { $null = $session.TrySkipPreviousAsync() }
-  'seek' { $ticks = [long]([Math]::Max(0, [Math]::Min(86400, [double]POSITION_PLACEHOLDER)) * 10000000); $null = $session.TryChangePlaybackPositionAsync($ticks) }
+  'playpause' { $null = Wait-Async ($session.TryTogglePlayPauseAsync()) }
+  'next' { $null = Wait-Async ($session.TrySkipNextAsync()) }
+  'previous' { $null = Wait-Async ($session.TrySkipPreviousAsync()) }
+  'seek' { $ticks = [long]([Math]::Max(0, [Math]::Min(86400, [double]POSITION_PLACEHOLDER)) * 10000000); $null = Wait-Async ($session.TryChangePlaybackPositionAsync($ticks)) }
  }
  'OK'
 } catch { 'ERROR: ' + $_.Exception.Message }`;
@@ -94,7 +95,7 @@ try {
 }
 function createWindow() {
  const {width}=screen.getPrimaryDisplay().workAreaSize;
- win=new BrowserWindow({width:480,height:390,minWidth:360,minHeight:300,maxWidth:760,maxHeight:600,x:Math.max(12,width-460),y:48,frame:false,transparent:true,resizable:true,alwaysOnTop:true,skipTaskbar:true,webPreferences:{preload:path.join(__dirname,'preload.js'),contextIsolation:true,nodeIntegration:false}});
+ win=new BrowserWindow({width:500,height:480,minWidth:340,minHeight:250,maxWidth:760,maxHeight:620,x:Math.max(12,width-460),y:48,frame:false,transparent:true,resizable:true,alwaysOnTop:true,skipTaskbar:true,webPreferences:{preload:path.join(__dirname,'preload.js'),contextIsolation:true,nodeIntegration:false}});
  win.loadFile('index.html');
  win.on('closed',()=>win=null);
 }
