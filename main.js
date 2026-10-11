@@ -56,14 +56,15 @@ try {
  } catch { $thumbnail = '' }
  @{ playing=($status -eq 'Playing'); title=$meta.Title; artist=$meta.Artist; album=$meta.AlbumTitle; app=$session.SourceAppUserModelId; status=$status; thumbnail=$thumbnail; thumbnailType=$thumbnailType; position=$position; duration=$duration; sessions=$sessions.Count } | ConvertTo-Json -Compress
 } catch { @{ playing=$false; title=''; artist=''; album=''; app=''; thumbnail=''; error=$_.Exception.Message } | ConvertTo-Json -Compress }`;
+
 function runPowerShell(script, timeout = 8000) {
- // Скрипт передаётся в UTF-16/Base64 (-EncodedCommand), чтобы кавычки и переводы строк не ломались,
- // а вывод принудительно идёт в UTF-8: иначе кириллица в названиях приходит искажённой (OEM 866).
  const prefix = "$ProgressPreference='SilentlyContinue'; try { [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding $false; $OutputEncoding = [Console]::OutputEncoding } catch {}\n";
  const encoded = Buffer.from(prefix + script, 'utf16le').toString('base64');
  return new Promise(resolve => execFile('powershell.exe', ['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-EncodedCommand',encoded], {timeout, windowsHide:true, maxBuffer: 10 * 1024 * 1024, encoding:'utf8'}, (err,out) => resolve({err,out:String(out || '').replace(/^\uFEFF/, '')})));
 }
-// Читает Windows Media Session. Обложку (до 3 МБ в base64) запрашиваем только когда она нужна.
+
+const coverCache = { key:'', base64:'', type:'image/jpeg', id:0, retries:0, lastTry:0 };
+let coverCounter = 0;
 async function readNowPlaying(includeThumb) {
  const script = ps.replace('INCLUDE_THUMB_PLACEHOLDER', () => includeThumb ? '$true' : '$false');
  const {out,err} = await runPowerShell(script);
@@ -72,14 +73,11 @@ async function readNowPlaying(includeThumb) {
    if (err && !parsed.error) parsed.warning = String(err.message || err);
    return parsed;
  } catch {
-   const detail = err?.killed ? 'PowerShell timed out while reading Windows media session' : (String(err?.message || out || 'No output from Windows media session').trim().slice(0,220));
-   return {playing:false,title:'',artist:'',album:'',app:'',thumbnail:'',error:detail || 'Windows media session unavailable'};
+   const detail = err?.killed ? 'PowerShell timed out' : (String(err?.message || out || '').trim().slice(0,220));
+   return {playing:false,title:'',artist:'',album:'',app:'',thumbnail:'',error:detail || 'Unavailable'};
  }
 }
-// Кэш обложки: читаем её при смене трека и ещё пару раз следом (источники нередко присылают её с задержкой),
-// а в окно отправляем только когда у обложки новый coverId.
-const coverCache = { key:'', base64:'', type:'image/jpeg', id:0, retries:0, lastTry:0 };
-let coverCounter = 0;
+
 async function nowPlaying(knownCoverId) {
   let d = await readNowPlaying(false);
   if (!d.error) {
@@ -88,10 +86,9 @@ async function nowPlaying(knownCoverId) {
       coverCache.key = key;
       coverCache.base64 = '';
       coverCache.id = 0;
-      coverCache.retries = key ? 8 : 0; // больше попыток — Яндекс.Музыка и др. часто отдают обложку с задержкой
+      coverCache.retries = key ? 8 : 0;
       coverCache.lastTry = 0;
     }
-    // Запрашиваем thumbnail, пока не получили. Даже после retries периодически пробуем ещё раз.
     const needThumb = key && (!coverCache.base64 || coverCache.retries > 0);
     const now = Date.now();
     if (needThumb && (coverCache.retries > 0 || now - coverCache.lastTry > 12000)) {
@@ -99,7 +96,6 @@ async function nowPlaying(knownCoverId) {
       coverCache.lastTry = now;
       const withThumb = await readNowPlaying(true);
       if (!withThumb.error && withThumb.title === d.title) {
-        // artist может прийти чуть позже — не требуем точного совпадения
         d = withThumb;
         if (d.thumbnail && d.thumbnail.length > 100 && d.thumbnail !== coverCache.base64) {
           coverCache.base64 = d.thumbnail;
@@ -117,6 +113,7 @@ async function nowPlaying(knownCoverId) {
   }
   return result;
 }
+
 async function mediaControl(action, position) {
  const script = `$ErrorActionPreference='Stop'
 try {
@@ -148,6 +145,7 @@ try {
  const {out} = await runPowerShell(safeScript, 6000);
  return {ok:out.trim()==='OK',message:out.trim()};
 }
+
 async function openSourceApp() {
  const d = await readNowPlaying(false);
  const appId = String(d.app || '').trim();
@@ -166,14 +164,15 @@ try {
  const {out} = await runPowerShell(script.replace('APP_ID_PLACEHOLDER', () => escaped), 5000);
  return {ok:out.trim()==='OK'};
 }
+
 function createWindow() {
  const {width}=screen.getPrimaryDisplay().workAreaSize;
  win=new BrowserWindow({width:360,height:420,minWidth:260,minHeight:200,maxWidth:720,maxHeight:580,x:Math.max(12,width-460),y:48,frame:false,transparent:true,resizable:true,alwaysOnTop:true,skipTaskbar:true,webPreferences:{preload:path.join(__dirname,'preload.js'),contextIsolation:true,nodeIntegration:false,autoplayPolicy:'no-user-gesture-required'}});
  win.loadFile('index.html');
  win.on('closed',()=>win=null);
 }
+
 app.whenReady().then(() => {
- // Системный звук для анализа баса: loopback без показа системного выбора экрана.
  session.defaultSession.setDisplayMediaRequestHandler(async (_request, callback) => {
    try {
      const sources = await desktopCapturer.getSources({types:['screen'], thumbnailSize:{width:0,height:0}});
@@ -183,6 +182,7 @@ app.whenReady().then(() => {
  }, {useSystemPicker:false});
  createWindow();
 });
+
 app.on('window-all-closed',()=>app.quit());
 ipcMain.handle('now-playing',(_event,knownCoverId)=>nowPlaying(knownCoverId));
 ipcMain.handle('audio-loopback-source', async () => {
@@ -197,4 +197,15 @@ ipcMain.on('window:close',()=>app.quit());
 ipcMain.on('window:minimize',()=>win?.minimize());
 ipcMain.on('window:toggle-pin',()=>{if(win)win.setAlwaysOnTop(!win.isAlwaysOnTop());});
 ipcMain.handle('window:get-size',()=>{if(!win)return {width:360,height:420};const [width,height]=win.getSize();return {width,height}});
-ipcMain.handle('window:resize-to',(_event,width,height)=>{if(!win)return {ok:false};const w=Math.max(260,Math.min(720,Number(width)||360));const h=Math.max(200,Math.min(580,Number(height)||420));win.setMinimumSize(260,200);win.setSize(Math.round(w),Math.round(h),true);return {ok:true,width:w,height:h};});
+
+// Корректный ресайз окна с учетом изменения левой/верхней позиции
+ipcMain.handle('window:resize-bounds', (_event, bounds) => {
+  if (!win) return {ok:false};
+  const current = win.getBounds();
+  const x = bounds.x !== undefined ? Math.round(bounds.x) : current.x;
+  const y = bounds.y !== undefined ? Math.round(bounds.y) : current.y;
+  const width = bounds.width !== undefined ? Math.max(260, Math.min(720, Math.round(bounds.width))) : current.width;
+  const height = bounds.height !== undefined ? Math.max(200, Math.min(580, Math.round(bounds.height))) : current.height;
+  win.setBounds({ x, y, width, height }, true);
+  return {ok:true};
+});
