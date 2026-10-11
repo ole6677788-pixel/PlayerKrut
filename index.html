@@ -41,7 +41,7 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
   transition:transform .35s cubic-bezier(.34,1.56,.64,1);
 }
 
-/* Cover (playing) */
+/* Cover — always visible when we have art */
 .cover-wrap{
   position:absolute;inset:0;
   border-radius:16px;
@@ -53,12 +53,15 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
   transition:opacity .4s ease, transform .4s cubic-bezier(.34,1.2,.64,1);
   pointer-events:none;
 }
-.playing .cover-wrap{opacity:1;transform:scale(1);pointer-events:auto}
+.cover-wrap.has-cover,
+.playing .cover-wrap{
+  opacity:1;transform:scale(1);pointer-events:auto;
+}
 .cover-wrap img{display:block;width:100%;height:100%;object-fit:cover}
 .cover-ph{position:absolute;inset:0;display:grid;place-items:center;color:#ffffff30;font-size:clamp(24px,8vh,42px);font-weight:600;pointer-events:none}
 .has-cover .cover-ph{display:none}
 
-/* Big Play button (paused) */
+/* Big Play — only when paused AND no cover */
 .big-play{
   position:absolute;inset:0;
   display:grid;place-items:center;
@@ -70,10 +73,25 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
   transition:opacity .35s ease, transform .4s cubic-bezier(.34,1.56,.64,1);
   cursor:pointer;
   -webkit-app-region:no-drag;
+  z-index:3;
 }
-.playing .big-play{opacity:0;transform:scale(.7);pointer-events:none}
+.playing .big-play,
+.has-cover ~ .big-play,
+.center-scene:has(.has-cover) .big-play{
+  opacity:0;transform:scale(.7);pointer-events:none;
+}
 .big-play svg{width:38%;height:38%;fill:#1a1a1a;margin-left:6%}
 .big-play:active{transform:scale(.92)}
+
+/* Play overlay on cover when paused */
+.cover-play-overlay{
+  position:absolute;inset:0;display:grid;place-items:center;
+  background:#0006;opacity:0;transition:opacity .25s;cursor:pointer;
+  -webkit-app-region:no-drag;z-index:2;
+}
+.shell:not(.playing) .cover-wrap.has-cover .cover-play-overlay{opacity:1}
+.shell.playing .cover-wrap.has-cover .cover-play-overlay{opacity:0;pointer-events:none}
+.cover-play-overlay svg{width:36%;height:36%;fill:#fff;filter:drop-shadow(0 2px 8px #0008)}
 
 /* ===== TRACK PILL (progress + name) ===== */
 .track-pill{
@@ -209,7 +227,7 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
     <div class="top">
       <div class="brand">PLAYERKRUT</div>
       <div class="actions">
-        <button class="version" id="version" title="Версия и изменения">v1.19.0</button>
+        <button class="version" id="version" title="Версия и изменения">v1.19.1</button>
         <button class="winbtn" id="pin" title="Поверх окон">⌖</button>
         <button class="winbtn" id="min" title="Свернуть">—</button>
         <button class="winbtn" id="close" title="Закрыть">×</button>
@@ -223,6 +241,9 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
         <div class="cover-wrap" id="coverWrap">
           <div class="cover-ph">♪</div>
           <img id="art" alt="" style="display:none">
+          <div class="cover-play-overlay" id="coverPlay" title="Play">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
         </div>
         <!-- Big Play (visible when paused) -->
         <button class="big-play" id="bigPlay" title="Play">
@@ -245,7 +266,7 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
     <div class="footer">
       <div class="footer-left" id="openapp" title="Вернуться в приложение">← ЯМузыка</div>
       <div class="footer-right">
-        <div class="footer-btn" id="versionFooter" title="Версия">v1.19.0</div>
+        <div class="footer-btn" id="versionFooter" title="Версия">v1.19.1</div>
         <div class="footer-btn settings" id="settingsBtn" title="Настройки">⚙</div>
       </div>
     </div>
@@ -261,7 +282,7 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
         <div class="s-modes">
           <button class="s-mode active" data-bg="argb">ARGB</button>
           <button class="s-mode" data-bg="static">Статичный</button>
-          <button class="s-mode" data-bg="ambient">Подсветка ПК</button>
+          <button class="s-mode" data-bg="ambient">Под обложку</button>
         </div>
       </div>
 
