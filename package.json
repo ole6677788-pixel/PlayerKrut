@@ -1,7 +1,7 @@
 {
   "name": "playerkrut",
-  "version": "1.17.0",
-  "description": "Compact Windows music mini-player with Yandex-style liquid ARGB background, resize from any edge, adaptive UI for play/pause, album art, metadata and bass-reactive glow",
+  "version": "1.18.0",
+  "description": "Compact Windows music mini-player with settings (ARGB/static/adaptive bg, EQ), resize from any edge, Yandex-style liquid background",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
