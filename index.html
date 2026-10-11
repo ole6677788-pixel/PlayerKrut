@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PlayerKrut · 1.12.0</title>
+<title>PlayerKrut · 1.12.1</title>
 <style>
-:root{color-scheme:dark;--accent:#D98383;--accent-soft:#d997a3;--text:#f8f4f5;--muted:#ffffff9c;--panel:#0b090c;--bar-fill:#b57487;--bar-rail:#4a3a44}
+:root{color-scheme:dark;--accent:#D98383;--accent-soft:#d997a3;--text:#f8f4f5;--muted:#ffffff9c;--panel:#0b090c;--bar-fill:#e0788f9e;--bar-rail:#ffffff24}
 *{box-sizing:border-box}
 html,body{width:100%;height:100%;min-width:0;min-height:0;margin:0;overflow:hidden;background:transparent;color:var(--text);font-family:Inter,"Segoe UI",Arial,sans-serif;user-select:none}
 body{padding:0}
 button{font:inherit}
-.shell{position:relative;isolation:isolate;display:flex;flex-direction:column;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden;padding:10px 12px 8px;border:1px solid #ffffff12;border-radius:16px;background:#09080bed;box-shadow:0 14px 38px #0008}
-.shell:before{content:"";position:absolute;inset:-28px;z-index:0;pointer-events:none;background-image:linear-gradient(180deg,#0807094d 0%,#0807099c 54%,#080709f2 100%),var(--cover-image,none);background-position:center;background-size:cover;filter:blur(28px) saturate(1.3);opacity:.85;transform:scale(1.12)}
-#aurora{position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;opacity:.96;filter:blur(14px)}
+.shell{position:relative;isolation:isolate;display:flex;flex-direction:column;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden;padding:10px 12px 8px;border:1px solid #ffffff12;border-radius:16px;background:#050405f2;box-shadow:0 14px 38px #0008}
+.shell:before{content:"";position:absolute;inset:-28px;z-index:0;pointer-events:none;background-image:linear-gradient(180deg,#0807094d 0%,#0807099c 54%,#080709f2 100%),var(--cover-image,none);background-position:center;background-size:cover;filter:blur(30px) saturate(1.2);opacity:.32;transform:scale(1.12)}
+#aurora{position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;opacity:1;filter:blur(6px)}
 .ui-layer{position:relative;z-index:1;display:flex;flex:1 1 auto;flex-direction:column;min-width:0;min-height:0}
 .top{display:flex;flex:0 0 auto;align-items:center;justify-content:space-between;gap:8px;min-width:0;min-height:23px;-webkit-app-region:drag}
 .brand{flex:0 0 auto;font-size:9px;font-weight:850;letter-spacing:1.35px;color:#ffffffc9}
@@ -97,7 +97,7 @@ button{font:inherit}
   <div class="top">
    <div class="brand">PLAYERKRUT</div>
    <div class="actions">
-    <button class="version" id="version" title="Что нового">v1.12.0</button>
+    <button class="version" id="version" title="Что нового">v1.12.1</button>
     <button class="winbtn sizebtn" id="smaller" title="Уменьшить окно" aria-label="Уменьшить окно">−</button>
     <button class="winbtn sizebtn" id="larger" title="Увеличить окно" aria-label="Увеличить окно">+</button>
     <button class="winbtn" id="pin" title="Поверх окон" aria-label="Поверх окон">⌖</button>
@@ -127,10 +127,9 @@ button{font:inherit}
  <div class="changelog" id="changelog" aria-hidden="true">
   <div class="change-card">
    <div class="change-head"><div><div class="change-kicker">PLAYERKRUT</div><div class="change-title">Что нового</div></div><button class="winbtn" id="closeChanges" aria-label="Закрыть список изменений">×</button></div>
-   <div class="change-version">Версия 1.12.0 · 11.10.2026</div>
-   <div class="change-item"><b>Реальная реакция на бас</b><span>Анализ системного звука через Web Audio API с одним анализатором. Если захват недоступен, в строке состояния это видно, а анимация только плавно дрейфует без имитации ударов.</span></div>
-   <div class="change-item"><b>Шкала на плашке названия</b><span>Перемотка не откатывается назад после отпускания, клавиши ← → ↑ ↓ PgUp PgDn Home End работают с задержкой отправки, при отсутствии поддержки перемотки источником показывается сообщение.</span></div>
-   <div class="change-item"><b>Обложка и нагрузка</b><span>Исправлен показ сломанной картинки, добавлена заглушка. Обложка читается из Windows только при смене трека, анимация рисуется в уменьшенном разрешении и останавливается в свёрнутом окне.</span></div>
+   <div class="change-version">Версия 1.12.1 · 11.10.2026</div>
+   <div class="change-item"><b>Большое жидкое пятно как в Яндекс Музыке</b><span>Крупная органичная форма за обложкой с тёмными краями и светлым ядром; на бас она заметно раздувается и ярче светится.</span></div>
+   <div class="change-item"><b>Название и исполнитель</b><span>PowerShell теперь запускается в кодировке UTF-8 и без проблем с кавычками; если источник не передал название, на экране видно, какое приложение его не отдаёт.</span></div>
    <button class="change-done" id="doneChanges">Понятно</button>
   </div>
  </div>
@@ -222,7 +221,8 @@ function applyNowPlaying(d) {
  dom.shell.classList.toggle('idle', !playing);
  dom.orbWrap.classList.toggle('playing', playing);
  setText(dom.title, has ? String(d.title) : 'Ничего не играет');
- setText(dom.artist, has ? (d.artist || 'Неизвестный исполнитель') : (d.error ? String(d.error) : 'Запусти музыку — я покажу трек'));
+ const appName = String(d.app || '').split('!')[0].split('.').pop();
+ setText(dom.artist, has ? (d.artist || 'Неизвестный исполнитель') : d.error ? String(d.error) : appName ? 'Источник «' + appName + '» не передал название трека' : 'Запусти музыку — я покажу трек');
  setText(dom.source, has ? String(d.app || 'DESKTOP').split('!')[0].split('.').pop().slice(0, 24).toUpperCase() : 'DESKTOP PLAYER');
  setText(dom.playpause, playing ? 'Ⅱ' : '▶');
  state.statusText = d.error ? 'ОШИБКА МЕДИАСЕССИИ' : playing ? 'ВОСПРОИЗВЕДЕНИЕ' : has ? 'ПАУЗА' : 'ОЖИДАНИЕ МУЗЫКИ';
@@ -473,16 +473,19 @@ function sampleBass(dt) {
  return n * n;
 }
 
-/* ---------- Жидкая анимация ---------- */
+/* ---------- Жидкая анимация: большое органичное пятно за обложкой ---------- */
 const aurora = (() => {
  const canvas = $('aurora'), ctx = canvas.getContext('2d');
- const SCALE = .5, POINTS = 48;
+ const SCALE = .5, POINTS = 72;
  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ // Формы: главное тёмно-малиновое пятно и два более светлых слоя поверх него.
  const blobs = [
-  { fx: -.10, fy: .02, rx: .36, ry: .30, seed: .2, sx: .21, sy: .17, k: .13, c: ['rgba(255,170,200,.36)', 'rgba(222,86,168,.28)', 'rgba(145,70,190,0)'] },
-  { fx: .16, fy: -.045, rx: .28, ry: .26, seed: 2.4, sx: .17, sy: .23, k: .17, c: ['rgba(255,208,226,.24)', 'rgba(178,91,205,.24)', 'rgba(80,98,214,0)'] },
-  { fx: -.01, fy: .10, rx: .22, ry: .20, seed: 4.1, sx: .26, sy: .19, k: .22, c: ['rgba(255,153,191,.24)', 'rgba(207,96,174,.22)', 'rgba(120,65,196,0)'] },
-  { fx: .05, fy: -.12, rx: .20, ry: .17, seed: 5.6, sx: .15, sy: .24, k: .20, c: ['rgba(190,150,255,.22)', 'rgba(140,84,214,.20)', 'rgba(90,60,200,0)'] }
+  { fx: 0, fy: -.02, rx: .43, ry: .40, seed: .3, sx: .16, sy: .13, k: .10, lobes: [2, 3, 5], amp: [.15, .10, .045], hl: -.28,
+    c: ['rgba(226,52,88,.96)', 'rgba(150,22,52,.94)', 'rgba(52,6,22,.92)'] },
+  { fx: -.14, fy: .06, rx: .27, ry: .24, seed: 2.6, sx: .21, sy: .18, k: .16, lobes: [3, 4, 2], amp: [.13, .08, .05], hl: -.2,
+    c: ['rgba(255,138,178,.55)', 'rgba(214,66,128,.34)', 'rgba(160,40,120,0)'] },
+  { fx: .17, fy: -.08, rx: .22, ry: .20, seed: 4.4, sx: .14, sy: .22, k: .20, lobes: [2, 5, 3], amp: [.14, .06, .05], hl: .1,
+    c: ['rgba(190,110,235,.40)', 'rgba(140,60,200,.24)', 'rgba(90,40,170,0)'] }
  ];
  let w = 1, h = 1, raf = 0, last = 0, t = 0, level = 0;
  function resize() {
@@ -492,26 +495,31 @@ const aurora = (() => {
   if (canvas.height !== nh) canvas.height = nh;
   w = nw; h = nh;
  }
- function drawBlob(b) {
-  const cx = w * (.5 + b.fx) + Math.sin(t * b.sx + b.seed) * w * .06;
-  const cy = h * (.48 + b.fy) + Math.cos(t * b.sy + b.seed * 1.7) * h * .05;
-  const rx = w * b.rx * (1 + level * b.k), ry = h * b.ry * (1 + level * b.k);
-  const amp1 = .05 + level * .09, amp2 = .03 + level * .05;
+ function pathBlob(b, grow) {
+  const cx = w * (.5 + b.fx) + Math.sin(t * b.sx + b.seed) * w * .045;
+  const cy = h * (.44 + b.fy) + Math.cos(t * b.sy + b.seed * 1.7) * h * .04;
+  const rx = w * b.rx * (1 + level * b.k) * grow, ry = h * b.ry * (1 + level * b.k) * grow;
+  const boost = 1 + level * 1.1;
   ctx.save();
   ctx.translate(cx, cy);
-  ctx.rotate(Math.sin(t * .34 + b.seed) * .1);
+  ctx.rotate(Math.sin(t * .22 + b.seed) * .16);
   ctx.beginPath();
   for (let i = 0; i <= POINTS; i++) {
    const a = i / POINTS * Math.PI * 2;
-   const wave = Math.sin(a * 3 + t * 1.0 + b.seed) * amp1 + Math.sin(a * 5 - t * .8 + b.seed * 2) * amp2 + Math.cos(a * 2 + t * .6 - b.seed) * .025;
+   let wave = 0;
+   for (let j = 0; j < 3; j++) wave += Math.sin(a * b.lobes[j] + t * (.55 + j * .27) * (j % 2 ? -1 : 1) + b.seed * (j + 1)) * b.amp[j] * boost;
    const px = Math.cos(a) * rx * (1 + wave), py = Math.sin(a) * ry * (1 + wave);
    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
   }
   ctx.closePath();
-  const g = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(rx, ry) * 1.1);
-  g.addColorStop(0, b.c[0]); g.addColorStop(.58, b.c[1]); g.addColorStop(1, b.c[2]);
-  ctx.fillStyle = g;
-  ctx.fill();
+  return { rx, ry };
+ }
+ function drawBlob(b) {
+  const { rx, ry } = pathBlob(b, 1);
+  const R = Math.max(rx, ry);
+  const g = ctx.createRadialGradient(R * b.hl, -R * .05, 0, 0, 0, R * 1.12);
+  g.addColorStop(0, b.c[0]); g.addColorStop(.55, b.c[1]); g.addColorStop(1, b.c[2]);
+  ctx.fillStyle = g; ctx.fill();
   ctx.restore();
  }
  function frame(now) {
@@ -523,19 +531,29 @@ const aurora = (() => {
   last = now;
   const target = sampleBass(dt);
   level += (target - level) * (1 - Math.pow(1 - (target > level ? .38 : .09), dt * 60));
-  t += dt * (state.playing ? 1 : .55) * (reduce ? .3 : 1);
+  t += dt * (state.playing ? 1 : .5) * (reduce ? .3 : 1);
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, w, h);
+  ctx.globalAlpha = state.playing ? 1 : .72;
+  // внешнее мягкое свечение вокруг главного пятна
+  ctx.globalCompositeOperation = 'lighter';
+  const m = blobs[0];
+  pathBlob(m, 1.22);
+  ctx.fillStyle = 'rgba(190,30,70,' + (.10 + level * .22) + ')';
+  ctx.fill(); ctx.restore();
+  // пятна
+  ctx.globalCompositeOperation = 'source-over';
+  drawBlob(blobs[0]);
   ctx.globalCompositeOperation = 'screen';
-  ctx.globalAlpha = state.playing ? 1 : .7;
-  const cx = w * .5, cy = h * .48;
-  const glow = ctx.createRadialGradient(cx, cy, Math.min(w, h) * .02, cx, cy, Math.max(w, h) * .68);
-  glow.addColorStop(0, 'rgba(231,143,177,' + (.12 + level * .32) + ')');
-  glow.addColorStop(.4, 'rgba(188,89,180,' + (.08 + level * .18) + ')');
-  glow.addColorStop(.75, 'rgba(85,65,190,' + (.04 + level * .09) + ')');
-  glow.addColorStop(1, 'rgba(12,0,20,0)');
-  ctx.fillStyle = glow; ctx.fillRect(0, 0, w, h);
-  for (const b of blobs) drawBlob(b);
+  drawBlob(blobs[1]);
+  drawBlob(blobs[2]);
+  // светлое ядро: реально усиливается только от баса
+  const cx = w * .5, cy = h * .42, core = Math.min(w, h) * (.30 + level * .10);
+  const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, core);
+  cg.addColorStop(0, 'rgba(255,120,160,' + (.10 + level * .38) + ')');
+  cg.addColorStop(1, 'rgba(255,120,160,0)');
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.fillStyle = cg; ctx.fillRect(0, 0, w, h);
   raf = requestAnimationFrame(frame);
  }
  function start() { if (!raf && !document.hidden) { last = performance.now(); raf = requestAnimationFrame(frame); } }
