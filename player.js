@@ -44,7 +44,7 @@ function applyBgColor() {
     return;
   }
   if (settings.bgMode === 'ambient') {
-    // ambient = подсветка ПК ≈ цвет обложки, иначе cyan
+    // ambient = под обложку ≈ цвет обложки, иначе cyan
     if (palette.ready) return;
     setPaletteFromRgb([0, 200, 230]);
     return;
@@ -231,6 +231,14 @@ $('bigPlay').onclick = () => {
   pop($('bigPlay'));
   control('playpause');
 };
+const coverPlay = $('coverPlay');
+if (coverPlay) {
+  coverPlay.onclick = (e) => {
+    e.stopPropagation();
+    pop(coverPlay);
+    control('playpause');
+  };
+}
 
 $('close').onclick = () => window.playerAPI.close();
 $('min').onclick = () => window.playerAPI.minimize();
@@ -238,7 +246,7 @@ $('pin').onclick = () => window.playerAPI.togglePin();
 
 function showVersion() {
   alert(
-    'PlayerKrut v1.19.0\n\n' +
+    'PlayerKrut v1.19.1\n\n' +
     '• Центрированный UI\n' +
     '• Фон: ARGB / статичный (много цветов) / подсветка ПК\n' +
     '• Яркость свечения\n' +
