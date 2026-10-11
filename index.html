@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PlayerKrut · 1.17.0</title>
+<title>PlayerKrut · 1.19.0</title>
 <style>
 :root{color-scheme:dark}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -166,6 +166,11 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 }
 .s-mode:hover{background:#ffffff18;color:#fff}
 .s-mode.active{background:#00c8e033;border-color:#00c8e066;color:#7fe8f5}
+.s-mode.color-swatch{
+  min-width:28px;width:28px;height:28px;padding:0;flex:0 0 28px;
+  border-radius:50%;border:2px solid #ffffff22;
+}
+.s-mode.color-swatch.active{border-color:#fff;box-shadow:0 0 0 2px #00c8e088}
 .s-color-row{display:flex;align-items:center;gap:8px;margin-top:8px}
 .s-color-row input[type=color]{
   width:36px;height:28px;border:0;border-radius:6px;background:transparent;cursor:pointer;padding:0;
@@ -204,7 +209,7 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
     <div class="top">
       <div class="brand">PLAYERKRUT</div>
       <div class="actions">
-        <button class="version" id="version" title="Версия и изменения">v1.18.0</button>
+        <button class="version" id="version" title="Версия и изменения">v1.19.0</button>
         <button class="winbtn" id="pin" title="Поверх окон">⌖</button>
         <button class="winbtn" id="min" title="Свернуть">—</button>
         <button class="winbtn" id="close" title="Закрыть">×</button>
@@ -228,9 +233,8 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
       <!-- Track name + progress (always) -->
       <div class="track-pill no-seek" id="title" role="slider" tabindex="0">Ищем музыку…</div>
 
-      <!-- Controls when playing -->
+      <!-- Controls when playing — centered -->
       <div class="controls-row playing-controls">
-        <button class="ctrl vol" id="volume" title="Громкость">🔊</button>
         <button class="ctrl" id="previous" title="Предыдущий">⏮</button>
         <button class="ctrl main" id="playpause" title="Pause">⏸</button>
         <button class="ctrl" id="next" title="Следующий">⏭</button>
@@ -241,7 +245,7 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
     <div class="footer">
       <div class="footer-left" id="openapp" title="Вернуться в приложение">← ЯМузыка</div>
       <div class="footer-right">
-        <div class="footer-btn" id="versionFooter" title="Версия">v1.18.0</div>
+        <div class="footer-btn" id="versionFooter" title="Версия">v1.19.0</div>
         <div class="footer-btn settings" id="settingsBtn" title="Настройки">⚙</div>
       </div>
     </div>
@@ -253,39 +257,38 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
       <h3>Настройки</h3>
 
       <div class="s-section">
-        <label>Фон (облако)</label>
+        <label>Режим фона</label>
         <div class="s-modes">
           <button class="s-mode active" data-bg="argb">ARGB</button>
           <button class="s-mode" data-bg="static">Статичный</button>
-          <button class="s-mode" data-bg="adaptive">Под обложку</button>
+          <button class="s-mode" data-bg="ambient">Подсветка ПК</button>
         </div>
-        <div class="s-color-row" id="staticColorRow" style="display:none">
+      </div>
+
+      <div class="s-section" id="staticColorsSection">
+        <label>Цвет фона</label>
+        <div class="s-modes" id="colorPresets">
+          <button class="s-mode color-swatch active" data-color="#00c8e0" style="background:#00c8e0" title="Cyan"></button>
+          <button class="s-mode color-swatch" data-color="#7c5cff" style="background:#7c5cff" title="Фиолет"></button>
+          <button class="s-mode color-swatch" data-color="#ff5a9e" style="background:#ff5a9e" title="Розовый"></button>
+          <button class="s-mode color-swatch" data-color="#00e8a0" style="background:#00e8a0" title="Мята"></button>
+          <button class="s-mode color-swatch" data-color="#ff8c42" style="background:#ff8c42" title="Оранж"></button>
+          <button class="s-mode color-swatch" data-color="#4da6ff" style="background:#4da6ff" title="Синий"></button>
+          <button class="s-mode color-swatch" data-color="#e8e8e8" style="background:#e8e8e8" title="Белый"></button>
+          <button class="s-mode color-swatch" data-color="#ff4455" style="background:#ff4455" title="Красный"></button>
+        </div>
+        <div class="s-color-row" style="margin-top:8px">
           <input type="color" id="staticColor" value="#00c8e0">
-          <span style="font-size:11px;color:#ffffff88">Цвет фона</span>
+          <span style="font-size:11px;color:#ffffff88">Свой цвет</span>
         </div>
       </div>
 
       <div class="s-section">
-        <label>Эквалайзер (визуал)</label>
+        <label>Яркость свечения</label>
         <div class="s-slider-row">
-          <span>Бас</span>
-          <input class="s-slider" type="range" id="eqBass" min="0" max="200" value="100">
-          <span id="eqBassVal">100%</span>
-        </div>
-        <div class="s-slider-row">
-          <span>Яркость</span>
-          <input class="s-slider" type="range" id="eqBright" min="30" max="150" value="100">
-          <span id="eqBrightVal">100%</span>
-        </div>
-      </div>
-
-      <div class="s-section">
-        <label>Системный цвет</label>
-        <div class="s-modes">
-          <button class="s-mode active" data-sys="auto">Авто</button>
-          <button class="s-mode" data-sys="cyan">Cyan</button>
-          <button class="s-mode" data-sys="purple">Фиолет</button>
-          <button class="s-mode" data-sys="pink">Розовый</button>
+          <span>Тёмн</span>
+          <input class="s-slider" type="range" id="glowBright" min="40" max="160" value="100">
+          <span id="glowBrightVal">100%</span>
         </div>
       </div>
 
