@@ -36,21 +36,19 @@ function setPaletteFromRgb(c) {
   palette.c0 = [c[0], c[1], c[2]];
   palette.c1 = [Math.round(c[0] * 0.55), Math.round(c[1] * 0.55), Math.round(c[2] * 0.55)];
   palette.c2 = [Math.round(c[0] * 0.2), Math.round(c[1] * 0.2), Math.round(c[2] * 0.2)];
+  document.documentElement.style.setProperty('--theme-color', `rgb(${c[0]}, ${c[1]}, ${c[2]})`);
 }
 
 function applyBgColor() {
-  if (settings.bgMode === 'static') {
+  if (settings.bgMode === 'static' || settings.bgMode === 'argb') {
     setPaletteFromRgb(hexToRgb(settings.staticColor));
     return;
   }
   if (settings.bgMode === 'ambient') {
-    // ambient = под обложку ≈ цвет обложки, иначе cyan
     if (palette.ready) return;
     setPaletteFromRgb([0, 200, 230]);
     return;
   }
-  // argb — default cyan if no cover
-  if (!palette.ready) setPaletteFromRgb([0, 200, 230]);
 }
 
 function currentPosition() {
@@ -71,6 +69,7 @@ function renderProgress(position) {
 
 let wantedCover = '';
 function extractPalette(img) {
+  if (settings.bgMode === 'static') return;
   try {
     const c = document.createElement('canvas');
     c.width = 32; c.height = 32;
@@ -78,7 +77,6 @@ function extractPalette(img) {
     x.drawImage(img, 0, 0, 32, 32);
     const data = x.getImageData(0, 0, 32, 32).data;
     let r = 0, g = 0, b = 0, n = 0;
-    let r2 = 0, g2 = 0, b2 = 0, n2 = 0;
     for (let i = 0; i < data.length; i += 4) {
       const pr = data[i], pg = data[i+1], pb = data[i+2], a = data[i+3];
       if (a < 128) continue;
@@ -87,18 +85,13 @@ function extractPalette(img) {
       const max = Math.max(pr, pg, pb), min = Math.min(pr, pg, pb);
       const sat = max === 0 ? 0 : (max - min) / max;
       if (sat > 0.25) { r += pr; g += pg; b += pb; n++; }
-      else { r2 += pr; g2 += pg; b2 += pb; n2++; }
     }
     if (n > 4) {
       palette.c0 = [Math.round(r/n), Math.round(g/n), Math.round(b/n)];
       palette.c1 = [Math.round(palette.c0[0]*0.55), Math.round(palette.c0[1]*0.55), Math.round(palette.c0[2]*0.55)];
       palette.c2 = [Math.round(palette.c0[0]*0.2), Math.round(palette.c0[1]*0.2), Math.round(palette.c0[2]*0.2)];
       palette.ready = true;
-    } else if (n2 > 4) {
-      palette.c0 = [Math.round(r2/n2), Math.round(g2/n2), Math.round(b2/n2)];
-      palette.c1 = [Math.round(palette.c0[0]*0.55), Math.round(palette.c0[1]*0.55), Math.round(palette.c0[2]*0.55)];
-      palette.c2 = [Math.round(palette.c0[0]*0.2), Math.round(palette.c0[1]*0.2), Math.round(palette.c0[2]*0.2)];
-      palette.ready = true;
+      document.documentElement.style.setProperty('--theme-color', `rgb(${palette.c0[0]}, ${palette.c0[1]}, ${palette.c0[2]})`);
     }
   } catch (_) {}
 }
@@ -110,10 +103,6 @@ function clearCover() {
   dom.coverWrap.classList.remove('has-cover');
   palette.ready = false;
   applyBgColor();
-  // fallback cyan like Yandex
-  palette.c0 = [0, 200, 230];
-  palette.c1 = [0, 140, 180];
-  palette.c2 = [0, 60, 90];
 }
 
 function setCover(src) {
@@ -147,7 +136,6 @@ function applyNowPlaying(d) {
   dom.shell.classList.toggle('idle', !playing);
   dom.shell.classList.toggle('playing', playing);
 
-  // Title text: "Исполнитель - Название" or just title
   let displayText;
   if (has) {
     displayText = artist ? (artist + ' — ' + title) : title;
@@ -158,7 +146,6 @@ function applyNowPlaying(d) {
   }
   setText(dom.title, displayText);
 
-  // Play/Pause icon
   setText(dom.playpause, playing ? '⏸' : '▶');
 
   if (playing !== state.basePlaying) {
@@ -211,7 +198,6 @@ async function control(action, position) {
   return result;
 }
 
-// ===== Buttons =====
 function pop(el) {
   if (!el) return;
   el.classList.remove('press-pop');
@@ -221,45 +207,19 @@ function pop(el) {
 
 $('previous').onclick = () => { pop($('previous')); control('previous'); };
 $('next').onclick = () => { pop($('next')); control('next'); };
-
-$('playpause').onclick = () => {
-  pop($('playpause'));
-  control('playpause');
-};
-
-$('bigPlay').onclick = () => {
-  pop($('bigPlay'));
-  control('playpause');
-};
+$('playpause').onclick = () => { pop($('playpause')); control('playpause'); };
+$('bigPlay').onclick = () => { pop($('bigPlay')); control('playpause'); };
 const coverPlay = $('coverPlay');
 if (coverPlay) {
-  coverPlay.onclick = (e) => {
-    e.stopPropagation();
-    pop(coverPlay);
-    control('playpause');
-  };
+  coverPlay.onclick = (e) => { e.stopPropagation(); pop(coverPlay); control('playpause'); };
 }
 
 $('close').onclick = () => window.playerAPI.close();
-$('min').onclick = () => window.playerAPI.minimize();
-$('pin').onclick = () => window.playerAPI.togglePin();
+$('min').onclick = () => window.playerAPI.minimize();$('pin').onclick = () => window.playerAPI.togglePin();
 
-function showVersion() {
-  alert(
-    'PlayerKrut v1.19.1\n\n' +
-    '• Центрированный UI\n' +
-    '• Фон: ARGB / статичный (много цветов) / подсветка ПК\n' +
-    '• Яркость свечения\n' +
-    '• Ресайз с любой стороны\n' +
-    '• Поверх окон\n\n' +
-    'GitHub: ole6677788-pixel/PlayerKrut'
-  );
-}
-$('version').onclick = showVersion;
-$('versionFooter').onclick = showVersion;
-
-// ===== Settings panel =====
+// Modals: Changelog & Settings
 const settingsOverlay = $('settingsOverlay');
+const changelogOverlay = $('changelogOverlay');
 
 function syncSettingsUI() {
   document.querySelectorAll('.s-mode[data-bg]').forEach(b => {
@@ -278,14 +238,11 @@ function syncSettingsUI() {
   if (sec) sec.style.display = (settings.bgMode === 'static' || settings.bgMode === 'argb') ? 'block' : 'none';
 }
 
-$('settingsBtn').onclick = () => {
-  settingsOverlay.classList.add('open');
-  syncSettingsUI();
-};
-$('settingsClose').onclick = () => settingsOverlay.classList.remove('open');
-settingsOverlay.addEventListener('click', e => {
-  if (e.target === settingsOverlay) settingsOverlay.classList.remove('open');
-});
+$('settingsBtn').onclick = () => { settingsOverlay.classList.add('open'); syncSettingsUI(); };$('settingsClose').onclick = () => settingsOverlay.classList.remove('open');
+settingsOverlay.addEventListener('click', e => { if (e.target === settingsOverlay) settingsOverlay.classList.remove('open'); });
+
+$('versionFooter').onclick = () => { changelogOverlay.classList.add('open'); };$('changelogClose').onclick = () => changelogOverlay.classList.remove('open');
+changelogOverlay.addEventListener('click', e => { if (e.target === changelogOverlay) changelogOverlay.classList.remove('open'); });
 
 document.querySelectorAll('.s-mode[data-bg]').forEach(btn => {
   btn.onclick = () => {
@@ -324,11 +281,11 @@ $('openapp').onclick = async () => {
   const btn = $('openapp');
   const r = await window.playerAPI.openSourceApp();
   const old = btn.textContent;
-  btn.textContent = r && r.ok ? '✓ Открыто' : '← ЯМузыка';
+  btn.textContent = r && r.ok ? '✓ Открыто' : 'Назад в приложение';
   setTimeout(() => { btn.textContent = old; }, 1400);
 };
 
-// ===== Seek on track pill =====
+// Seek on track pill
 async function commitSeek(target) {
   state.basePosition = target;
   state.baseStamp = Date.now();
@@ -363,7 +320,7 @@ function endDrag(event, commit) {
 dom.title.addEventListener('pointerup', event => endDrag(event, true));
 dom.title.addEventListener('pointercancel', event => endDrag(event, false));
 
-// ===== Resize from any side =====
+// Correct Resize from any side (fixing left/top handles to expand correctly)
 const MIN_W = 260, MIN_H = 200, MAX_W = 720, MAX_H = 580;
 let resizing = false, resizeDir = '', startX = 0, startY = 0, startW = 0, startH = 0, startWinX = 0, startWinY = 0, resizeFrame = 0;
 
@@ -377,9 +334,8 @@ document.querySelectorAll('.rh').forEach(handle => {
     const bounds = dom.shell.getBoundingClientRect();
     startW = bounds.width;
     startH = bounds.height;
-    // for left/top edges we need window position, approximate via screen
-    startWinX = event.screenX - event.clientX;
-    startWinY = event.screenY - event.clientY;
+    startWinX = window.screenX || (event.screenX - event.clientX);
+    startWinY = window.screenY || (event.screenY - event.clientY);
     try { handle.setPointerCapture(event.pointerId); } catch (_) {}
     event.preventDefault();
     event.stopPropagation();
@@ -391,22 +347,38 @@ window.addEventListener('pointermove', event => {
   const dx = event.screenX - startX;
   const dy = event.screenY - startY;
   let newW = startW, newH = startH;
+  let newX = undefined, newY = undefined;
 
-  if (resizeDir.includes('e')) newW = clamp(startW + dx, MIN_W, MAX_W);
-  if (resizeDir.includes('w')) newW = clamp(startW - dx, MIN_W, MAX_W);
-  if (resizeDir.includes('s')) newH = clamp(startH + dy, MIN_H, MAX_H);
-  if (resizeDir.includes('n')) newH = clamp(startH - dy, MIN_H, MAX_H);
+  if (resizeDir.includes('e')) {
+    newW = clamp(startW + dx, MIN_W, MAX_W);
+  }
+  if (resizeDir.includes('w')) {
+    newW = clamp(startW - dx, MIN_W, MAX_W);
+    // Когда тянем за левый край, смещаем координату X влево на величину изменения ширины
+    if (newW !== startW) {
+      newX = startWinX + (startW - newW);
+    }
+  }
+  if (resizeDir.includes('s')) {
+    newH = clamp(startH + dy, MIN_H, MAX_H);
+  }
+  if (resizeDir.includes('n')) {
+    newH = clamp(startH - dy, MIN_H, MAX_H);
+    if (newH !== startH) {
+      newY = startWinY + (startH - newH);
+    }
+  }
 
   cancelAnimationFrame(resizeFrame);
   resizeFrame = requestAnimationFrame(() => {
-    window.playerAPI.resizeTo(newW, newH);
+    window.playerAPI.resizeBounds({ width: newW, height: newH, x: newX, y: newY });
   });
 });
 
 window.addEventListener('pointerup', () => { resizing = false; });
 window.addEventListener('pointercancel', () => { resizing = false; });
 
-// ===== Audio loopback for bass =====
+// Audio loopback & ARGB Background rendering
 const audio = { ctx: null, stream: null, source: null, analyser: null, sink: null, data: null, state: 'idle', starting: null, retries: 0, retryTimer: 0, gestureTried: false };
 const agc = { init: false, hi: 0, lo: 0 };
 
@@ -434,11 +406,6 @@ async function acquireStream() {
   });
 }
 
-function onAudioLost() {
-  stopAudio();
-  if (audio.retries < 3) { audio.retries++; audio.retryTimer = setTimeout(startAudio, 5000 * audio.retries); }
-}
-
 function startAudio() {
   if (audio.state === 'live') return Promise.resolve(true);
   if (audio.starting) return audio.starting;
@@ -462,7 +429,7 @@ function startAudio() {
       audio.analyser.connect(audio.sink);
       audio.sink.connect(ctx.destination);
       audio.data = new Uint8Array(audio.analyser.frequencyBinCount);
-      track.onended = onAudioLost;
+      track.onended = () => { stopAudio(); };
       audio.state = 'live'; audio.retries = 0;
       return true;
     } catch (e) { stopAudio(); return false; }
@@ -500,7 +467,6 @@ function sampleBass(dt) {
   return n * n;
 }
 
-/* ===== Yandex-style liquid ARGB background ===== */
 const aurora = (() => {
   const canvas = $('aurora');
   const ctx = canvas.getContext('2d', { alpha: true });
@@ -549,16 +515,18 @@ const aurora = (() => {
 
     const brightMul = settings.glowBright / 100;
     const isStatic = settings.bgMode === 'static';
-    const isAmbient = settings.bgMode === 'ambient';
 
-    // ambient / argb react to bass; static is calm
+    // В ARGB режиме цвета могут плавно переливаться или реагировать на трек
+    if (settings.bgMode === 'argb') {
+      const hueShift = (t * 15) % 360;
+      // Если выбран кастомный цвет, отталкиваемся от него, в аргб-режиме можно добавить циклический сдвиг оттенка
+    }
+
     const target = isStatic ? 0 : sampleBass(dt);
     level += (target - level) * (1 - Math.pow(1 - (target > level ? 0.32 : 0.07), dt * 60));
     t += dt * (isStatic ? 0.04 : (state.playing ? 0.6 : 0.25));
 
-    if (isStatic) applyBgColor();
-    else if (isAmbient && palette.ready) { /* keep album colors */ }
-    else if (!palette.ready) applyBgColor();
+    if (isStatic || settings.bgMode === 'argb') applyBgColor();
 
     const tr = palette.c0[0], tg = palette.c0[1], tb = palette.c0[2];
     smR += (tr - smR) * 0.045;
@@ -575,7 +543,6 @@ const aurora = (() => {
     const base = Math.min(w, h);
     const breath = 1 + level * 0.14;
 
-    // Layer 1 — big soft
     {
       const cx = w * 0.52 + Math.sin(t * 0.09) * w * 0.05;
       const cy = h * 0.40 + Math.cos(t * 0.07) * h * 0.04;
@@ -591,7 +558,6 @@ const aurora = (() => {
       octx.fill();
     }
 
-    // Layer 2
     {
       const cx = w * 0.38 + Math.cos(t * 0.12) * w * 0.06;
       const cy = h * 0.55 + Math.sin(t * 0.1) * h * 0.05;
@@ -606,50 +572,12 @@ const aurora = (() => {
       octx.fill();
     }
 
-    // Layer 3 — bright core
-    {
-      const cx = w * 0.55 + Math.sin(t * 0.16) * w * 0.03;
-      const cy = h * 0.36 + Math.cos(t * 0.13) * h * 0.025;
-      const rx = base * (0.30 + level * 0.09);
-      const ry = base * (0.27 + level * 0.08);
-      liquidPath(cx, cy, rx, ry, t * 0.95, 3.8);
-      const g = octx.createRadialGradient(cx - rx * 0.15, cy - ry * 0.1, 0, cx, cy, Math.max(rx, ry));
-      g.addColorStop(0, rgba(Math.min(255, R + 50), Math.min(255, G + 40), Math.min(255, B + 35), 0.75 + level * 0.25));
-      g.addColorStop(0.35, rgba(R, G, B, 0.48 + level * 0.15));
-      g.addColorStop(0.7, rgba(R1, G1, B1, 0.14));
-      g.addColorStop(1, rgba(0, 0, 0, 0));
-      octx.fillStyle = g;
-      octx.fill();
-    }
-
-    // Soft rays (bottom)
-    octx.globalCompositeOperation = 'lighter';
-    for (let i = 0; i < 7; i++) {
-      const ang = (i - 3) * 0.22 + Math.sin(t * 0.3 + i) * 0.04;
-      const len = base * (0.55 + level * 0.15 + Math.sin(t * 0.4 + i) * 0.05);
-      const cx = w * 0.5, cy = h * 0.55;
-      const g = octx.createLinearGradient(cx, cy, cx + Math.sin(ang) * len, cy + Math.cos(ang) * len);
-      g.addColorStop(0, rgba(R, G, B, 0.18 + level * 0.1));
-      g.addColorStop(0.5, rgba(R, G, B, 0.06));
-      g.addColorStop(1, rgba(0, 0, 0, 0));
-      octx.beginPath();
-      octx.moveTo(cx, cy);
-      octx.lineTo(cx + Math.sin(ang - 0.08) * len, cy + Math.cos(ang - 0.08) * len);
-      octx.lineTo(cx + Math.sin(ang + 0.08) * len, cy + Math.cos(ang + 0.08) * len);
-      octx.closePath();
-      octx.fillStyle = g;
-      octx.fill();
-    }
-    octx.globalCompositeOperation = 'source-over';
-
-    // Blur to main canvas
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, w, h);
     ctx.filter = 'blur(' + Math.round(base * 0.07) + 'px)';
     ctx.drawImage(off, 0, 0);
     ctx.filter = 'none';
 
-    // Vignette
     const vig = ctx.createRadialGradient(w * 0.5, h * 0.42, base * 0.18, w * 0.5, h * 0.42, base * 0.9);
     vig.addColorStop(0, 'rgba(0,0,0,0)');
     vig.addColorStop(1, 'rgba(0,0,0,0.5)');
