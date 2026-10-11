@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PlayerKrut · 1.16.0</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:transparent;color:#fff;font-family:"Segoe UI",Inter,system-ui,sans-serif;user-select:none}
+button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer}
+.shell{
+  position:relative;isolation:isolate;display:flex;flex-direction:column;
+  width:100%;height:100%;overflow:hidden;border-radius:18px;
+  background:#000;box-shadow:0 24px 60px #000c;
+}
+#aurora{position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none}
+
+.ui-layer{position:relative;z-index:1;display:flex;flex:1;flex-direction:column;min-height:0;padding:10px 14px 12px}
+
+/* ===== TOP BAR ===== */
+.top{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:22px;-webkit-app-region:drag}
+.brand{font-size:9px;font-weight:700;letter-spacing:1.1px;color:#ffffff55}
+.actions{display:flex;align-items:center;gap:4px;-webkit-app-region:no-drag}
+.version{padding:3px 8px;border-radius:7px;background:#ffffff12;color:#a0d8e8;font-size:9px;cursor:pointer;transition:background .15s}
+.version:hover{background:#ffffff22}
+.winbtn{display:grid;place-items:center;width:22px;height:22px;border-radius:6px;background:#ffffff10;color:#ffffffb0;font-size:12px;transition:all .15s}
+.winbtn:hover{background:#ffffff28;color:#fff}
+
+/* ===== STAGE ===== */
+.stage{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;min-height:0;gap:0;position:relative}
+
+/* ===== COVER / PLAY BUTTON ===== */
+.center-scene{
+  position:relative;
+  width:min(42vw,28vh,150px);
+  aspect-ratio:1;
+  flex:0 0 auto;
+  margin-bottom:16px;
+  z-index:2;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* Cover (playing) */
+.cover-wrap{
+  position:absolute;inset:0;
+  border-radius:16px;
+  overflow:hidden;
+  background:#1a1a1e;
+  box-shadow:0 12px 40px #000a;
+  opacity:0;
+  transform:scale(.92);
+  transition:opacity .4s ease, transform .4s cubic-bezier(.34,1.2,.64,1);
+  pointer-events:none;
+}
+.playing .cover-wrap{opacity:1;transform:scale(1);pointer-events:auto}
+.cover-wrap img{display:block;width:100%;height:100%;object-fit:cover}
+.cover-ph{position:absolute;inset:0;display:grid;place-items:center;color:#ffffff30;font-size:clamp(24px,8vh,42px);font-weight:600;pointer-events:none}
+.has-cover .cover-ph{display:none}
+
+/* Big Play button (paused) */
+.big-play{
+  position:absolute;inset:0;
+  display:grid;place-items:center;
+  border-radius:50%;
+  background:#f5c6c0;
+  box-shadow:0 8px 32px #0008, 0 0 60px #00e5ff44;
+  opacity:1;
+  transform:scale(1);
+  transition:opacity .35s ease, transform .4s cubic-bezier(.34,1.56,.64,1);
+  cursor:pointer;
+  -webkit-app-region:no-drag;
+}
+.playing .big-play{opacity:0;transform:scale(.7);pointer-events:none}
+.big-play svg{width:38%;height:38%;fill:#1a1a1a;margin-left:6%}
+.big-play:active{transform:scale(.92)}
+
+/* ===== TRACK PILL (progress + name) ===== */
+.track-pill{
+  display:flex;align-items:center;justify-content:center;
+  width:min(86%,280px);
+  height:36px;
+  border-radius:999px;
+  background:linear-gradient(90deg,
+    #00c8e0cc 0%,
+    #00c8e0cc var(--track-progress,0%),
+    #ffffff18 var(--track-progress,0%),
+    #ffffff18 100%);
+  border:1px solid #ffffff18;
+  color:#fff;
+  font-size:clamp(11px,2.8vw,13px);
+  font-weight:600;
+  line-height:1.2;
+  text-align:center;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  padding:0 16px;
+  cursor:pointer;
+  touch-action:none;
+  -webkit-app-region:no-drag;
+  transition:filter .15s, transform .2s;
+  z-index:2;
+}
+.track-pill:hover{filter:brightness(1.1)}
+.track-pill.no-seek{cursor:default}
+.track-pill:active{transform:scale(.98)}
+
+/* ===== CONTROLS ===== */
+.controls-row{
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  margin-top:14px;z-index:2;-webkit-app-region:no-drag;
+}
+.ctrl{
+  display:grid;place-items:center;
+  width:34px;height:34px;border-radius:50%;
+  background:#ffffff14;color:#ffffffcc;
+  font-size:14px;transition:transform .15s,background .15s,color .15s;
+}
+.ctrl:hover{transform:scale(1.12);background:#ffffff24;color:#fff}
+.ctrl:active{transform:scale(.9)}
+.ctrl.main{
+  width:44px;height:44px;
+  background:#ffffff22;font-size:18px;color:#fff;
+}
+.ctrl.main:hover{background:#ffffff33}
+.ctrl.like{font-size:16px}
+.ctrl.like.active{color:#ff6b8a;background:#ff6b8a22}
+.ctrl.vol{font-size:15px}
+
+/* Bottom controls only visible when playing */
+.playing-controls{opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .35s,transform .35s}
+.playing .playing-controls{opacity:1;transform:translateY(0);pointer-events:auto}
+
+/* ===== FOOTER ===== */
+.footer{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:10px;padding:0 2px;
+  font-size:10px;color:#ffffff55;-webkit-app-region:no-drag;
+}
+.footer-left,.footer-right{cursor:pointer;padding:3px 6px;border-radius:6px;transition:color .15s,background .15s}
+.footer-left:hover,.footer-right:hover{color:#ffffffaa;background:#ffffff10}
+
+/* Resize */
+.resize-grip{position:absolute;right:2px;bottom:2px;z-index:6;width:14px;height:14px;cursor:nwse-resize;opacity:.3}
+
+/* Press animation helper */
+.press-pop{animation:pop .28s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+</style>
+</head>
+<body>
+<div class="shell idle" id="shell">
+  <canvas id="aurora" aria-hidden="true"></canvas>
+
+  <div class="ui-layer">
+    <!-- TOP -->
+    <div class="top">
+      <div class="brand">PLAYERKRUT</div>
+      <div class="actions">
+        <button class="version" id="version" title="Версия и изменения">v1.16.0</button>
+        <button class="winbtn" id="pin" title="Поверх окон">⌖</button>
+        <button class="winbtn" id="min" title="Свернуть">—</button>
+        <button class="winbtn" id="close" title="Закрыть">×</button>
+      </div>
+    </div>
+
+    <!-- CENTER -->
+    <div class="stage">
+      <div class="center-scene" id="centerScene">
+        <!-- Cover (visible when playing) -->
+        <div class="cover-wrap" id="coverWrap">
+          <div class="cover-ph">♪</div>
+          <img id="art" alt="" style="display:none">
+        </div>
+        <!-- Big Play (visible when paused) -->
+        <button class="big-play" id="bigPlay" title="Play">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+      </div>
+
+      <!-- Track name + progress (always) -->
+      <div class="track-pill no-seek" id="title" role="slider" tabindex="0">Ищем музыку…</div>
+
+      <!-- Controls when playing -->
+      <div class="controls-row playing-controls">
+        <button class="ctrl vol" id="volume" title="Громкость">🔊</button>
+        <button class="ctrl" id="previous" title="Предыдущий">⏮</button>
+        <button class="ctrl main" id="playpause" title="Pause">⏸</button>
+        <button class="ctrl" id="next" title="Следующий">⏭</button>
+        <button class="ctrl like" id="like" title="В избранное">♡</button>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <div class="footer-left" id="openapp" title="Вернуться в приложение">← ЯМузыка</div>
+      <div class="footer-right" id="versionFooter" title="Версия">v1.16.0</div>
+    </div>
+  </div>
+
+  <div class="resize-grip" id="resizeGrip"></div>
+</div>
+<script src="player.js"></script>
+</body>
+</html>
