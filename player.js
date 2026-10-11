@@ -218,9 +218,10 @@ $('pin').onclick = () => window.playerAPI.togglePin();
 
 function showVersion() {
   alert(
-    'PlayerKrut v1.16.0\n\n' +
+    'PlayerKrut v1.17.0\n\n' +
     '• UI по референсу (пауза / воспроизведение)\n' +
-    '• Жидкий ARGB-фон в стиле Яндекс.Музыки\n' +
+    '• Жидкий ARGB-фон, подстраивается под обложку\n' +
+    '• Ресайз с любой стороны окна\n' +
     '• Обложка, название, исполнитель\n' +
     '• Перемотка, prev/next, избранное\n' +
     '• Поверх окон, масштабирование\n' +
@@ -273,26 +274,47 @@ function endDrag(event, commit) {
 dom.title.addEventListener('pointerup', event => endDrag(event, true));
 dom.title.addEventListener('pointercancel', event => endDrag(event, false));
 
-const grip = $('resizeGrip');
-let resizing = false, startX = 0, startY = 0, startW = 0, startH = 0, resizeFrame = 0;
-grip.addEventListener('pointerdown', event => {
-  resizing = true;
-  startX = event.screenX; startY = event.screenY;
-  const bounds = dom.shell.getBoundingClientRect();
-  startW = bounds.width; startH = bounds.height;
-  try { grip.setPointerCapture(event.pointerId); } catch (_) {}
-  event.preventDefault(); event.stopPropagation();
+// ===== Resize from any side =====
+const MIN_W = 260, MIN_H = 200, MAX_W = 720, MAX_H = 580;
+let resizing = false, resizeDir = '', startX = 0, startY = 0, startW = 0, startH = 0, startWinX = 0, startWinY = 0, resizeFrame = 0;
+
+document.querySelectorAll('.rh').forEach(handle => {
+  handle.addEventListener('pointerdown', event => {
+    if (event.button !== 0 && event.pointerType === 'mouse') return;
+    resizing = true;
+    resizeDir = handle.dataset.dir || 'se';
+    startX = event.screenX;
+    startY = event.screenY;
+    const bounds = dom.shell.getBoundingClientRect();
+    startW = bounds.width;
+    startH = bounds.height;
+    startWinX = event.screenX - event.clientX;
+    startWinY = event.screenY - event.clientY;
+    try { handle.setPointerCapture(event.pointerId); } catch (_) {}
+    event.preventDefault();
+    event.stopPropagation();
+  });
 });
-grip.addEventListener('pointermove', event => {
+
+window.addEventListener('pointermove', event => {
   if (!resizing) return;
-  const width = clamp(startW + event.screenX - startX, 260, 720);
-  const height = clamp(startH + event.screenY - startY, 200, 580);
+  const dx = event.screenX - startX;
+  const dy = event.screenY - startY;
+  let newW = startW, newH = startH;
+
+  if (resizeDir.includes('e')) newW = clamp(startW + dx, MIN_W, MAX_W);
+  if (resizeDir.includes('w')) newW = clamp(startW - dx, MIN_W, MAX_W);
+  if (resizeDir.includes('s')) newH = clamp(startH + dy, MIN_H, MAX_H);
+  if (resizeDir.includes('n')) newH = clamp(startH - dy, MIN_H, MAX_H);
+
   cancelAnimationFrame(resizeFrame);
-  resizeFrame = requestAnimationFrame(() => window.playerAPI.resizeTo(width, height));
+  resizeFrame = requestAnimationFrame(() => {
+    window.playerAPI.resizeTo(newW, newH);
+  });
 });
-const stopResize = () => { resizing = false; };
-grip.addEventListener('pointerup', stopResize);
-grip.addEventListener('pointercancel', stopResize);
+
+window.addEventListener('pointerup', () => { resizing = false; });
+window.addEventListener('pointercancel', () => { resizing = false; });
 
 const audio = { ctx: null, stream: null, source: null, analyser: null, sink: null, data: null, state: 'idle', starting: null, retries: 0, retryTimer: 0, gestureTried: false };
 const agc = { init: false, hi: 0, lo: 0 };
