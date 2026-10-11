@@ -10,18 +10,51 @@ const dom = {
   coverWrap: $('coverWrap'),
   centerScene: $('centerScene'),
   bigPlay: $('bigPlay'),
-  playpause: $('playpause'),
-  like: $('like')
+  playpause: $('playpause')
 };
 
 const state = {
   busy: false, dragging: false, playing: false,
   basePosition: 0, baseDuration: 0, baseStamp: Date.now(), basePlaying: false,
-  seekTarget: 0, ignorePollUntil: 0, coverId: 0,
-  liked: false
+  seekTarget: 0, ignorePollUntil: 0, coverId: 0
+};
+
+const settings = {
+  bgMode: localStorage.getItem('pk_bg') || 'argb',
+  staticColor: localStorage.getItem('pk_color') || '#00c8e0',
+  eqBass: Number(localStorage.getItem('pk_bass') || 100),
+  eqBright: Number(localStorage.getItem('pk_bright') || 100),
+  sysColor: localStorage.getItem('pk_sys') || 'auto'
+};
+
+const SYS_COLORS = {
+  auto: [0, 200, 230],
+  cyan: [0, 200, 230],
+  purple: [140, 80, 255],
+  pink: [255, 90, 160]
 };
 
 const palette = { c0: [0, 200, 230], c1: [0, 140, 180], c2: [0, 60, 90], ready: false };
+
+function hexToRgb(hex) {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return m ? [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)] : [0, 200, 230];
+}
+
+function applySysColor() {
+  if (settings.bgMode === 'static') {
+    const c = hexToRgb(settings.staticColor);
+    palette.c0 = c;
+    palette.c1 = [Math.round(c[0] * 0.55), Math.round(c[1] * 0.55), Math.round(c[2] * 0.55)];
+    palette.c2 = [Math.round(c[0] * 0.2), Math.round(c[1] * 0.2), Math.round(c[2] * 0.2)];
+    return;
+  }
+  if (settings.bgMode === 'adaptive' && palette.ready) return;
+  const c = SYS_COLORS[settings.sysColor] || SYS_COLORS.auto;
+  palette.c0 = c.slice();
+  palette.c1 = [Math.round(c[0] * 0.55), Math.round(c[1] * 0.55), Math.round(c[2] * 0.55)];
+  palette.c2 = [Math.round(c[0] * 0.2), Math.round(c[1] * 0.2), Math.round(c[2] * 0.2)];
+}
 
 function currentPosition() {
   const raw = state.basePosition + (state.basePlaying ? (Date.now() - state.baseStamp) / 1000 : 0);
@@ -79,6 +112,8 @@ function clearCover() {
   dom.art.style.display = 'none';
   dom.coverWrap.classList.remove('has-cover');
   palette.ready = false;
+  applySysColor();
+  // fallback cyan like Yandex
   palette.c0 = [0, 200, 230];
   palette.c1 = [0, 140, 180];
   palette.c2 = [0, 60, 90];
@@ -115,6 +150,7 @@ function applyNowPlaying(d) {
   dom.shell.classList.toggle('idle', !playing);
   dom.shell.classList.toggle('playing', playing);
 
+  // Title text: "Исполнитель - Название" or just title
   let displayText;
   if (has) {
     displayText = artist ? (artist + ' — ' + title) : title;
@@ -125,6 +161,7 @@ function applyNowPlaying(d) {
   }
   setText(dom.title, displayText);
 
+  // Play/Pause icon
   setText(dom.playpause, playing ? '⏸' : '▶');
 
   if (playing !== state.basePlaying) {
@@ -177,6 +214,7 @@ async function control(action, position) {
   return result;
 }
 
+// ===== Buttons =====
 function pop(el) {
   if (!el) return;
   el.classList.remove('press-pop');
@@ -197,13 +235,6 @@ $('bigPlay').onclick = () => {
   control('playpause');
 };
 
-$('like').onclick = () => {
-  state.liked = !state.liked;
-  dom.like.classList.toggle('active', state.liked);
-  setText(dom.like, state.liked ? '♥' : '♡');
-  pop(dom.like);
-};
-
 $('volume').onclick = () => {
   pop($('volume'));
   const btn = $('volume');
@@ -218,19 +249,78 @@ $('pin').onclick = () => window.playerAPI.togglePin();
 
 function showVersion() {
   alert(
-    'PlayerKrut v1.17.0\n\n' +
-    '• UI по референсу (пауза / воспроизведение)\n' +
-    '• Жидкий ARGB-фон, подстраивается под обложку\n' +
-    '• Ресайз с любой стороны окна\n' +
-    '• Обложка, название, исполнитель\n' +
-    '• Перемотка, prev/next, избранное\n' +
-    '• Поверх окон, масштабирование\n' +
-    '• Анимации кнопок\n\n' +
+    'PlayerKrut v1.18.0\n\n' +
+    '• UI по референсу\n' +
+    '• Настройки: фон ARGB / статичный / под обложку\n' +
+    '• Эквалайзер (бас + яркость визуала)\n' +
+    '• Ресайз с любой стороны\n' +
+    '• Поверх окон\n\n' +
     'GitHub: ole6677788-pixel/PlayerKrut'
   );
 }
 $('version').onclick = showVersion;
 $('versionFooter').onclick = showVersion;
+
+// ===== Settings panel =====
+const settingsOverlay = $('settingsOverlay');
+$('settingsBtn').onclick = () => {
+  settingsOverlay.classList.add('open');
+  // sync UI
+  document.querySelectorAll('.s-mode[data-bg]').forEach(b => {
+    b.classList.toggle('active', b.dataset.bg === settings.bgMode);
+  });
+  document.querySelectorAll('.s-mode[data-sys]').forEach(b => {
+    b.classList.toggle('active', b.dataset.sys === settings.sysColor);
+  });
+  $('staticColorRow').style.display = settings.bgMode === 'static' ? 'flex' : 'none';
+  $('staticColor').value = settings.staticColor;
+  $('eqBass').value = settings.eqBass;
+  $('eqBassVal').textContent = settings.eqBass + '%';
+  $('eqBright').value = settings.eqBright;
+  $('eqBrightVal').textContent = settings.eqBright + '%';
+};
+$('settingsClose').onclick = () => settingsOverlay.classList.remove('open');
+settingsOverlay.addEventListener('click', e => {
+  if (e.target === settingsOverlay) settingsOverlay.classList.remove('open');
+});
+
+document.querySelectorAll('.s-mode[data-bg]').forEach(btn => {
+  btn.onclick = () => {
+    settings.bgMode = btn.dataset.bg;
+    localStorage.setItem('pk_bg', settings.bgMode);
+    document.querySelectorAll('.s-mode[data-bg]').forEach(b => b.classList.toggle('active', b === btn));
+    $('staticColorRow').style.display = settings.bgMode === 'static' ? 'flex' : 'none';
+    applySysColor();
+  };
+});
+
+document.querySelectorAll('.s-mode[data-sys]').forEach(btn => {
+  btn.onclick = () => {
+    settings.sysColor = btn.dataset.sys;
+    localStorage.setItem('pk_sys', settings.sysColor);
+    document.querySelectorAll('.s-mode[data-sys]').forEach(b => b.classList.toggle('active', b === btn));
+    applySysColor();
+  };
+});
+
+$('staticColor').oninput = () => {
+  settings.staticColor = $('staticColor').value;
+  localStorage.setItem('pk_color', settings.staticColor);
+  applySysColor();
+};
+
+$('eqBass').oninput = () => {
+  settings.eqBass = Number($('eqBass').value);
+  localStorage.setItem('pk_bass', settings.eqBass);
+  $('eqBassVal').textContent = settings.eqBass + '%';
+};
+$('eqBright').oninput = () => {
+  settings.eqBright = Number($('eqBright').value);
+  localStorage.setItem('pk_bright', settings.eqBright);
+  $('eqBrightVal').textContent = settings.eqBright + '%';
+};
+
+applySysColor();
 
 $('openapp').onclick = async () => {
   const btn = $('openapp');
@@ -240,6 +330,7 @@ $('openapp').onclick = async () => {
   setTimeout(() => { btn.textContent = old; }, 1400);
 };
 
+// ===== Seek on track pill =====
 async function commitSeek(target) {
   state.basePosition = target;
   state.baseStamp = Date.now();
@@ -288,6 +379,7 @@ document.querySelectorAll('.rh').forEach(handle => {
     const bounds = dom.shell.getBoundingClientRect();
     startW = bounds.width;
     startH = bounds.height;
+    // for left/top edges we need window position, approximate via screen
     startWinX = event.screenX - event.clientX;
     startWinY = event.screenY - event.clientY;
     try { handle.setPointerCapture(event.pointerId); } catch (_) {}
@@ -316,6 +408,7 @@ window.addEventListener('pointermove', event => {
 window.addEventListener('pointerup', () => { resizing = false; });
 window.addEventListener('pointercancel', () => { resizing = false; });
 
+// ===== Audio loopback for bass =====
 const audio = { ctx: null, stream: null, source: null, analyser: null, sink: null, data: null, state: 'idle', starting: null, retries: 0, retryTimer: 0, gestureTried: false };
 const agc = { init: false, hi: 0, lo: 0 };
 
@@ -409,6 +502,7 @@ function sampleBass(dt) {
   return n * n;
 }
 
+/* ===== Yandex-style liquid ARGB background ===== */
 const aurora = (() => {
   const canvas = $('aurora');
   const ctx = canvas.getContext('2d', { alpha: true });
@@ -455,16 +549,23 @@ const aurora = (() => {
     const dt = Math.min(0.08, Math.max(0.001, (now - last) / 1000));
     last = now;
 
-    const target = sampleBass(dt);
+    const bassMul = settings.eqBass / 100;
+    const brightMul = settings.eqBright / 100;
+    const isStatic = settings.bgMode === 'static';
+
+    const target = isStatic ? 0 : sampleBass(dt) * bassMul;
     level += (target - level) * (1 - Math.pow(1 - (target > level ? 0.32 : 0.07), dt * 60));
-    t += dt * (state.playing ? 0.6 : 0.25);
+    t += dt * (isStatic ? 0.05 : (state.playing ? 0.6 : 0.25));
+
+    if (settings.bgMode === 'static') applySysColor();
+    else if (settings.bgMode === 'argb' && settings.sysColor !== 'auto') applySysColor();
 
     const tr = palette.c0[0], tg = palette.c0[1], tb = palette.c0[2];
     smR += (tr - smR) * 0.045;
     smG += (tg - smG) * 0.045;
     smB += (tb - smB) * 0.045;
 
-    const R = smR, G = smG, B = smB;
+    const R = smR * brightMul, G = smG * brightMul, B = smB * brightMul;
     const R1 = R * 0.5, G1 = G * 0.5, B1 = B * 0.5;
     const R2 = R * 0.18, G2 = G * 0.18, B2 = B * 0.18;
 
@@ -474,6 +575,7 @@ const aurora = (() => {
     const base = Math.min(w, h);
     const breath = 1 + level * 0.14;
 
+    // Layer 1 — big soft
     {
       const cx = w * 0.52 + Math.sin(t * 0.09) * w * 0.05;
       const cy = h * 0.40 + Math.cos(t * 0.07) * h * 0.04;
@@ -489,6 +591,7 @@ const aurora = (() => {
       octx.fill();
     }
 
+    // Layer 2
     {
       const cx = w * 0.38 + Math.cos(t * 0.12) * w * 0.06;
       const cy = h * 0.55 + Math.sin(t * 0.1) * h * 0.05;
@@ -503,6 +606,7 @@ const aurora = (() => {
       octx.fill();
     }
 
+    // Layer 3 — bright core
     {
       const cx = w * 0.55 + Math.sin(t * 0.16) * w * 0.03;
       const cy = h * 0.36 + Math.cos(t * 0.13) * h * 0.025;
@@ -518,6 +622,7 @@ const aurora = (() => {
       octx.fill();
     }
 
+    // Soft rays (bottom)
     octx.globalCompositeOperation = 'lighter';
     for (let i = 0; i < 7; i++) {
       const ang = (i - 3) * 0.22 + Math.sin(t * 0.3 + i) * 0.04;
@@ -537,12 +642,14 @@ const aurora = (() => {
     }
     octx.globalCompositeOperation = 'source-over';
 
+    // Blur to main canvas
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, w, h);
     ctx.filter = 'blur(' + Math.round(base * 0.07) + 'px)';
     ctx.drawImage(off, 0, 0);
     ctx.filter = 'none';
 
+    // Vignette
     const vig = ctx.createRadialGradient(w * 0.5, h * 0.42, base * 0.18, w * 0.5, h * 0.42, base * 0.9);
     vig.addColorStop(0, 'rgba(0,0,0,0)');
     vig.addColorStop(1, 'rgba(0,0,0,0.5)');
