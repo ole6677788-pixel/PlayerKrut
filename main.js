@@ -78,30 +78,44 @@ async function readNowPlaying(includeThumb) {
 }
 // Кэш обложки: читаем её при смене трека и ещё пару раз следом (источники нередко присылают её с задержкой),
 // а в окно отправляем только когда у обложки новый coverId.
-const coverCache = { key:'', base64:'', type:'image/jpeg', id:0, retries:0 };
+const coverCache = { key:'', base64:'', type:'image/jpeg', id:0, retries:0, lastTry:0 };
 let coverCounter = 0;
 async function nowPlaying(knownCoverId) {
- let d = await readNowPlaying(false);
- if (!d.error) {
-   const key = d.title ? [d.app, d.title, d.artist, d.album].join('\u0001') : '';
-   if (key !== coverCache.key) {
-     coverCache.key = key; coverCache.base64 = ''; coverCache.id = 0; coverCache.retries = key ? 3 : 0;
-   }
-   if (key && coverCache.retries > 0) {
-     coverCache.retries--;
-     const withThumb = await readNowPlaying(true);
-     if (!withThumb.error && withThumb.title === d.title && withThumb.artist === d.artist) {
-       d = withThumb;
-       if (d.thumbnail && d.thumbnail !== coverCache.base64) {
-         coverCache.base64 = d.thumbnail; coverCache.type = d.thumbnailType || 'image/jpeg'; coverCache.id = ++coverCounter;
-       }
-     }
-   }
- }
- const result = {...d, thumbnail:'', coverId:d.error ? 0 : coverCache.id, thumbnailType:coverCache.type};
- delete result.thumbnail;
- if (!d.error && coverCache.id && coverCache.id !== Number(knownCoverId)) result.thumbnail = coverCache.base64;
- return result;
+  let d = await readNowPlaying(false);
+  if (!d.error) {
+    const key = d.title ? [d.app || '', d.title || '', d.artist || '', d.album || ''].join('\u0001') : '';
+    if (key !== coverCache.key) {
+      coverCache.key = key;
+      coverCache.base64 = '';
+      coverCache.id = 0;
+      coverCache.retries = key ? 8 : 0; // больше попыток — Яндекс.Музыка и др. часто отдают обложку с задержкой
+      coverCache.lastTry = 0;
+    }
+    // Запрашиваем thumbnail, пока не получили. Даже после retries периодически пробуем ещё раз.
+    const needThumb = key && (!coverCache.base64 || coverCache.retries > 0);
+    const now = Date.now();
+    if (needThumb && (coverCache.retries > 0 || now - coverCache.lastTry > 12000)) {
+      if (coverCache.retries > 0) coverCache.retries--;
+      coverCache.lastTry = now;
+      const withThumb = await readNowPlaying(true);
+      if (!withThumb.error && withThumb.title === d.title) {
+        // artist может прийти чуть позже — не требуем точного совпадения
+        d = withThumb;
+        if (d.thumbnail && d.thumbnail.length > 100 && d.thumbnail !== coverCache.base64) {
+          coverCache.base64 = d.thumbnail;
+          coverCache.type = d.thumbnailType || 'image/jpeg';
+          coverCache.id = ++coverCounter;
+          coverCache.retries = 0;
+        }
+      }
+    }
+  }
+  const result = { ...d, thumbnail: '', coverId: d.error ? 0 : coverCache.id, thumbnailType: coverCache.type };
+  delete result.thumbnail;
+  if (!d.error && coverCache.id && coverCache.id !== Number(knownCoverId)) {
+    result.thumbnail = coverCache.base64;
+  }
+  return result;
 }
 async function mediaControl(action, position) {
  const script = `$ErrorActionPreference='Stop'
