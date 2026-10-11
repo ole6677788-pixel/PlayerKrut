@@ -26,7 +26,7 @@ try {
  }
  if ($null -eq $session) { $session = $manager.GetCurrentSession() }
  if ($null -eq $session -and $sessions.Count -gt 0) { $session = $sessions[0] }
- if ($null -eq $session) { @{ playing=$false; title=''; artist=''; album=''; app=''; thumbnail=''; position=0; duration=0 } | ConvertTo-Json -Compress; exit }
+ if ($null -eq $session) { @{ playing=$false; title=''; artist=''; album=''; app=''; thumbnail=''; position=0; duration=0; sessions=0 } | ConvertTo-Json -Compress; exit }
  $op2 = $session.TryGetMediaPropertiesAsync()
  $task2 = $asTask.MakeGenericMethod([Windows.Media.Control.GlobalSystemMediaTransportControlsSessionMediaProperties]).Invoke($null, @($op2))
  $meta = $task2.GetAwaiter().GetResult()
@@ -54,10 +54,14 @@ try {
      }
    }
  } catch { $thumbnail = '' }
- @{ playing=($status -eq 'Playing'); title=$meta.Title; artist=$meta.Artist; album=$meta.AlbumTitle; app=$session.SourceAppUserModelId; status=$status; thumbnail=$thumbnail; thumbnailType=$thumbnailType; position=$position; duration=$duration } | ConvertTo-Json -Compress
+ @{ playing=($status -eq 'Playing'); title=$meta.Title; artist=$meta.Artist; album=$meta.AlbumTitle; app=$session.SourceAppUserModelId; status=$status; thumbnail=$thumbnail; thumbnailType=$thumbnailType; position=$position; duration=$duration; sessions=$sessions.Count } | ConvertTo-Json -Compress
 } catch { @{ playing=$false; title=''; artist=''; album=''; app=''; thumbnail=''; error=$_.Exception.Message } | ConvertTo-Json -Compress }`;
 function runPowerShell(script, timeout = 8000) {
- return new Promise(resolve => execFile('powershell.exe', ['-NoProfile','-ExecutionPolicy','Bypass','-Command',script], {timeout, windowsHide:true, maxBuffer: 10 * 1024 * 1024}, (err,out) => resolve({err,out:String(out || '')})));
+ // Скрипт передаётся в UTF-16/Base64 (-EncodedCommand), чтобы кавычки и переводы строк не ломались,
+ // а вывод принудительно идёт в UTF-8: иначе кириллица в названиях приходит искажённой (OEM 866).
+ const prefix = "$ProgressPreference='SilentlyContinue'; try { [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding $false; $OutputEncoding = [Console]::OutputEncoding } catch {}\n";
+ const encoded = Buffer.from(prefix + script, 'utf16le').toString('base64');
+ return new Promise(resolve => execFile('powershell.exe', ['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-EncodedCommand',encoded], {timeout, windowsHide:true, maxBuffer: 10 * 1024 * 1024, encoding:'utf8'}, (err,out) => resolve({err,out:String(out || '').replace(/^\uFEFF/, '')})));
 }
 // Читает Windows Media Session. Обложку (до 3 МБ в base64) запрашиваем только когда она нужна.
 async function readNowPlaying(includeThumb) {
