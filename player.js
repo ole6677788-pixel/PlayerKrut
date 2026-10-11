@@ -20,18 +20,9 @@ const state = {
 };
 
 const settings = {
-  bgMode: localStorage.getItem('pk_bg') || 'argb',
+  bgMode: localStorage.getItem('pk_bg') || 'argb',  // argb | static | ambient
   staticColor: localStorage.getItem('pk_color') || '#00c8e0',
-  eqBass: Number(localStorage.getItem('pk_bass') || 100),
-  eqBright: Number(localStorage.getItem('pk_bright') || 100),
-  sysColor: localStorage.getItem('pk_sys') || 'auto'
-};
-
-const SYS_COLORS = {
-  auto: [0, 200, 230],
-  cyan: [0, 200, 230],
-  purple: [140, 80, 255],
-  pink: [255, 90, 160]
+  glowBright: Number(localStorage.getItem('pk_glow') || 100)
 };
 
 const palette = { c0: [0, 200, 230], c1: [0, 140, 180], c2: [0, 60, 90], ready: false };
@@ -41,19 +32,25 @@ function hexToRgb(hex) {
   return m ? [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)] : [0, 200, 230];
 }
 
-function applySysColor() {
-  if (settings.bgMode === 'static') {
-    const c = hexToRgb(settings.staticColor);
-    palette.c0 = c;
-    palette.c1 = [Math.round(c[0] * 0.55), Math.round(c[1] * 0.55), Math.round(c[2] * 0.55)];
-    palette.c2 = [Math.round(c[0] * 0.2), Math.round(c[1] * 0.2), Math.round(c[2] * 0.2)];
-    return;
-  }
-  if (settings.bgMode === 'adaptive' && palette.ready) return;
-  const c = SYS_COLORS[settings.sysColor] || SYS_COLORS.auto;
-  palette.c0 = c.slice();
+function setPaletteFromRgb(c) {
+  palette.c0 = [c[0], c[1], c[2]];
   palette.c1 = [Math.round(c[0] * 0.55), Math.round(c[1] * 0.55), Math.round(c[2] * 0.55)];
   palette.c2 = [Math.round(c[0] * 0.2), Math.round(c[1] * 0.2), Math.round(c[2] * 0.2)];
+}
+
+function applyBgColor() {
+  if (settings.bgMode === 'static') {
+    setPaletteFromRgb(hexToRgb(settings.staticColor));
+    return;
+  }
+  if (settings.bgMode === 'ambient') {
+    // ambient = подсветка ПК ≈ цвет обложки, иначе cyan
+    if (palette.ready) return;
+    setPaletteFromRgb([0, 200, 230]);
+    return;
+  }
+  // argb — default cyan if no cover
+  if (!palette.ready) setPaletteFromRgb([0, 200, 230]);
 }
 
 function currentPosition() {
@@ -112,7 +109,7 @@ function clearCover() {
   dom.art.style.display = 'none';
   dom.coverWrap.classList.remove('has-cover');
   palette.ready = false;
-  applySysColor();
+  applyBgColor();
   // fallback cyan like Yandex
   palette.c0 = [0, 200, 230];
   palette.c1 = [0, 140, 180];
@@ -235,24 +232,16 @@ $('bigPlay').onclick = () => {
   control('playpause');
 };
 
-$('volume').onclick = () => {
-  pop($('volume'));
-  const btn = $('volume');
-  const was = btn.textContent;
-  btn.textContent = '🔇';
-  setTimeout(() => { btn.textContent = was; }, 600);
-};
-
 $('close').onclick = () => window.playerAPI.close();
 $('min').onclick = () => window.playerAPI.minimize();
 $('pin').onclick = () => window.playerAPI.togglePin();
 
 function showVersion() {
   alert(
-    'PlayerKrut v1.18.0\n\n' +
-    '• UI по референсу\n' +
-    '• Настройки: фон ARGB / статичный / под обложку\n' +
-    '• Эквалайзер (бас + яркость визуала)\n' +
+    'PlayerKrut v1.19.0\n\n' +
+    '• Центрированный UI\n' +
+    '• Фон: ARGB / статичный (много цветов) / подсветка ПК\n' +
+    '• Яркость свечения\n' +
     '• Ресайз с любой стороны\n' +
     '• Поверх окон\n\n' +
     'GitHub: ole6677788-pixel/PlayerKrut'
@@ -263,21 +252,27 @@ $('versionFooter').onclick = showVersion;
 
 // ===== Settings panel =====
 const settingsOverlay = $('settingsOverlay');
-$('settingsBtn').onclick = () => {
-  settingsOverlay.classList.add('open');
-  // sync UI
+
+function syncSettingsUI() {
   document.querySelectorAll('.s-mode[data-bg]').forEach(b => {
     b.classList.toggle('active', b.dataset.bg === settings.bgMode);
   });
-  document.querySelectorAll('.s-mode[data-sys]').forEach(b => {
-    b.classList.toggle('active', b.dataset.sys === settings.sysColor);
+  document.querySelectorAll('.color-swatch').forEach(b => {
+    b.classList.toggle('active', b.dataset.color.toLowerCase() === settings.staticColor.toLowerCase());
   });
-  $('staticColorRow').style.display = settings.bgMode === 'static' ? 'flex' : 'none';
-  $('staticColor').value = settings.staticColor;
-  $('eqBass').value = settings.eqBass;
-  $('eqBassVal').textContent = settings.eqBass + '%';
-  $('eqBright').value = settings.eqBright;
-  $('eqBrightVal').textContent = settings.eqBright + '%';
+  const colorInput = $('staticColor');
+  if (colorInput) colorInput.value = settings.staticColor;
+  const gb = $('glowBright');
+  const gv = $('glowBrightVal');
+  if (gb) gb.value = settings.glowBright;
+  if (gv) gv.textContent = settings.glowBright + '%';
+  const sec = $('staticColorsSection');
+  if (sec) sec.style.display = (settings.bgMode === 'static' || settings.bgMode === 'argb') ? 'block' : 'none';
+}
+
+$('settingsBtn').onclick = () => {
+  settingsOverlay.classList.add('open');
+  syncSettingsUI();
 };
 $('settingsClose').onclick = () => settingsOverlay.classList.remove('open');
 settingsOverlay.addEventListener('click', e => {
@@ -288,39 +283,34 @@ document.querySelectorAll('.s-mode[data-bg]').forEach(btn => {
   btn.onclick = () => {
     settings.bgMode = btn.dataset.bg;
     localStorage.setItem('pk_bg', settings.bgMode);
-    document.querySelectorAll('.s-mode[data-bg]').forEach(b => b.classList.toggle('active', b === btn));
-    $('staticColorRow').style.display = settings.bgMode === 'static' ? 'flex' : 'none';
-    applySysColor();
+    syncSettingsUI();
+    applyBgColor();
   };
 });
 
-document.querySelectorAll('.s-mode[data-sys]').forEach(btn => {
+document.querySelectorAll('.color-swatch').forEach(btn => {
   btn.onclick = () => {
-    settings.sysColor = btn.dataset.sys;
-    localStorage.setItem('pk_sys', settings.sysColor);
-    document.querySelectorAll('.s-mode[data-sys]').forEach(b => b.classList.toggle('active', b === btn));
-    applySysColor();
+    settings.staticColor = btn.dataset.color;
+    localStorage.setItem('pk_color', settings.staticColor);
+    syncSettingsUI();
+    applyBgColor();
   };
 });
 
 $('staticColor').oninput = () => {
   settings.staticColor = $('staticColor').value;
   localStorage.setItem('pk_color', settings.staticColor);
-  applySysColor();
+  syncSettingsUI();
+  applyBgColor();
 };
 
-$('eqBass').oninput = () => {
-  settings.eqBass = Number($('eqBass').value);
-  localStorage.setItem('pk_bass', settings.eqBass);
-  $('eqBassVal').textContent = settings.eqBass + '%';
-};
-$('eqBright').oninput = () => {
-  settings.eqBright = Number($('eqBright').value);
-  localStorage.setItem('pk_bright', settings.eqBright);
-  $('eqBrightVal').textContent = settings.eqBright + '%';
+$('glowBright').oninput = () => {
+  settings.glowBright = Number($('glowBright').value);
+  localStorage.setItem('pk_glow', settings.glowBright);
+  $('glowBrightVal').textContent = settings.glowBright + '%';
 };
 
-applySysColor();
+applyBgColor();
 
 $('openapp').onclick = async () => {
   const btn = $('openapp');
@@ -549,16 +539,18 @@ const aurora = (() => {
     const dt = Math.min(0.08, Math.max(0.001, (now - last) / 1000));
     last = now;
 
-    const bassMul = settings.eqBass / 100;
-    const brightMul = settings.eqBright / 100;
+    const brightMul = settings.glowBright / 100;
     const isStatic = settings.bgMode === 'static';
+    const isAmbient = settings.bgMode === 'ambient';
 
-    const target = isStatic ? 0 : sampleBass(dt) * bassMul;
+    // ambient / argb react to bass; static is calm
+    const target = isStatic ? 0 : sampleBass(dt);
     level += (target - level) * (1 - Math.pow(1 - (target > level ? 0.32 : 0.07), dt * 60));
-    t += dt * (isStatic ? 0.05 : (state.playing ? 0.6 : 0.25));
+    t += dt * (isStatic ? 0.04 : (state.playing ? 0.6 : 0.25));
 
-    if (settings.bgMode === 'static') applySysColor();
-    else if (settings.bgMode === 'argb' && settings.sysColor !== 'auto') applySysColor();
+    if (isStatic) applyBgColor();
+    else if (isAmbient && palette.ready) { /* keep album colors */ }
+    else if (!palette.ready) applyBgColor();
 
     const tr = palette.c0[0], tg = palette.c0[1], tb = palette.c0[2];
     smR += (tr - smR) * 0.045;
