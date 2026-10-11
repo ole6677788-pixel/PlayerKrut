@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PlayerKrut · 1.16.0</title>
+<title>PlayerKrut · 1.17.0</title>
 <style>
 :root{color-scheme:dark}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -18,7 +18,6 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 
 .ui-layer{position:relative;z-index:1;display:flex;flex:1;flex-direction:column;min-height:0;padding:10px 14px 12px}
 
-/* ===== TOP BAR ===== */
 .top{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:22px;-webkit-app-region:drag}
 .brand{font-size:9px;font-weight:700;letter-spacing:1.1px;color:#ffffff55}
 .actions{display:flex;align-items:center;gap:4px;-webkit-app-region:no-drag}
@@ -27,10 +26,8 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 .winbtn{display:grid;place-items:center;width:22px;height:22px;border-radius:6px;background:#ffffff10;color:#ffffffb0;font-size:12px;transition:all .15s}
 .winbtn:hover{background:#ffffff28;color:#fff}
 
-/* ===== STAGE ===== */
 .stage{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;min-height:0;gap:0;position:relative}
 
-/* ===== COVER / PLAY BUTTON ===== */
 .center-scene{
   position:relative;
   width:min(42vw,28vh,150px);
@@ -41,7 +38,6 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
   transition:transform .35s cubic-bezier(.34,1.56,.64,1);
 }
 
-/* Cover (playing) */
 .cover-wrap{
   position:absolute;inset:0;
   border-radius:16px;
@@ -58,7 +54,6 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 .cover-ph{position:absolute;inset:0;display:grid;place-items:center;color:#ffffff30;font-size:clamp(24px,8vh,42px);font-weight:600;pointer-events:none}
 .has-cover .cover-ph{display:none}
 
-/* Big Play button (paused) */
 .big-play{
   position:absolute;inset:0;
   display:grid;place-items:center;
@@ -75,7 +70,6 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 .big-play svg{width:38%;height:38%;fill:#1a1a1a;margin-left:6%}
 .big-play:active{transform:scale(.92)}
 
-/* ===== TRACK PILL (progress + name) ===== */
 .track-pill{
   display:flex;align-items:center;justify-content:center;
   width:min(86%,280px);
@@ -106,7 +100,6 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 .track-pill.no-seek{cursor:default}
 .track-pill:active{transform:scale(.98)}
 
-/* ===== CONTROLS ===== */
 .controls-row{
   display:flex;align-items:center;justify-content:center;gap:14px;
   margin-top:14px;z-index:2;-webkit-app-region:no-drag;
@@ -128,11 +121,9 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 .ctrl.like.active{color:#ff6b8a;background:#ff6b8a22}
 .ctrl.vol{font-size:15px}
 
-/* Bottom controls only visible when playing */
 .playing-controls{opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .35s,transform .35s}
 .playing .playing-controls{opacity:1;transform:translateY(0);pointer-events:auto}
 
-/* ===== FOOTER ===== */
 .footer{
   display:flex;align-items:center;justify-content:space-between;
   margin-top:10px;padding:0 2px;
@@ -141,10 +132,16 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 .footer-left,.footer-right{cursor:pointer;padding:3px 6px;border-radius:6px;transition:color .15s,background .15s}
 .footer-left:hover,.footer-right:hover{color:#ffffffaa;background:#ffffff10}
 
-/* Resize */
-.resize-grip{position:absolute;right:2px;bottom:2px;z-index:6;width:14px;height:14px;cursor:nwse-resize;opacity:.3}
+.rh{position:absolute;z-index:20;background:transparent;-webkit-app-region:no-drag}
+.rh-n{top:0;left:10px;right:10px;height:6px;cursor:ns-resize}
+.rh-s{bottom:0;left:10px;right:10px;height:6px;cursor:ns-resize}
+.rh-e{top:10px;right:0;bottom:10px;width:6px;cursor:ew-resize}
+.rh-w{top:10px;left:0;bottom:10px;width:6px;cursor:ew-resize}
+.rh-ne{top:0;right:0;width:12px;height:12px;cursor:nesw-resize}
+.rh-nw{top:0;left:0;width:12px;height:12px;cursor:nwse-resize}
+.rh-se{bottom:0;right:0;width:14px;height:14px;cursor:nwse-resize}
+.rh-sw{bottom:0;left:0;width:12px;height:12px;cursor:nesw-resize}
 
-/* Press animation helper */
 .press-pop{animation:pop .28s cubic-bezier(.34,1.56,.64,1)}
 @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
 </style>
@@ -154,35 +151,29 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
   <canvas id="aurora" aria-hidden="true"></canvas>
 
   <div class="ui-layer">
-    <!-- TOP -->
     <div class="top">
       <div class="brand">PLAYERKRUT</div>
       <div class="actions">
-        <button class="version" id="version" title="Версия и изменения">v1.16.0</button>
+        <button class="version" id="version" title="Версия и изменения">v1.17.0</button>
         <button class="winbtn" id="pin" title="Поверх окон">⌖</button>
         <button class="winbtn" id="min" title="Свернуть">—</button>
         <button class="winbtn" id="close" title="Закрыть">×</button>
       </div>
     </div>
 
-    <!-- CENTER -->
     <div class="stage">
       <div class="center-scene" id="centerScene">
-        <!-- Cover (visible when playing) -->
         <div class="cover-wrap" id="coverWrap">
           <div class="cover-ph">♪</div>
           <img id="art" alt="" style="display:none">
         </div>
-        <!-- Big Play (visible when paused) -->
         <button class="big-play" id="bigPlay" title="Play">
           <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </button>
       </div>
 
-      <!-- Track name + progress (always) -->
       <div class="track-pill no-seek" id="title" role="slider" tabindex="0">Ищем музыку…</div>
 
-      <!-- Controls when playing -->
       <div class="controls-row playing-controls">
         <button class="ctrl vol" id="volume" title="Громкость">🔊</button>
         <button class="ctrl" id="previous" title="Предыдущий">⏮</button>
@@ -192,14 +183,20 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
       </div>
     </div>
 
-    <!-- FOOTER -->
     <div class="footer">
       <div class="footer-left" id="openapp" title="Вернуться в приложение">← ЯМузыка</div>
-      <div class="footer-right" id="versionFooter" title="Версия">v1.16.0</div>
+      <div class="footer-right" id="versionFooter" title="Версия">v1.17.0</div>
     </div>
   </div>
 
-  <div class="resize-grip" id="resizeGrip"></div>
+  <div class="rh rh-n" data-dir="n"></div>
+  <div class="rh rh-s" data-dir="s"></div>
+  <div class="rh rh-e" data-dir="e"></div>
+  <div class="rh rh-w" data-dir="w"></div>
+  <div class="rh rh-ne" data-dir="ne"></div>
+  <div class="rh rh-nw" data-dir="nw"></div>
+  <div class="rh rh-se" data-dir="se"></div>
+  <div class="rh rh-sw" data-dir="sw"></div>
 </div>
 <script src="player.js"></script>
 </body>
