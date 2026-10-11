@@ -18,6 +18,7 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 
 .ui-layer{position:relative;z-index:1;display:flex;flex:1;flex-direction:column;min-height:0;padding:10px 14px 12px}
 
+/* ===== TOP BAR ===== */
 .top{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:22px;-webkit-app-region:drag}
 .brand{font-size:9px;font-weight:700;letter-spacing:1.1px;color:#ffffff55}
 .actions{display:flex;align-items:center;gap:4px;-webkit-app-region:no-drag}
@@ -26,8 +27,10 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 .winbtn{display:grid;place-items:center;width:22px;height:22px;border-radius:6px;background:#ffffff10;color:#ffffffb0;font-size:12px;transition:all .15s}
 .winbtn:hover{background:#ffffff28;color:#fff}
 
+/* ===== STAGE ===== */
 .stage{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;min-height:0;gap:0;position:relative}
 
+/* ===== COVER / PLAY BUTTON ===== */
 .center-scene{
   position:relative;
   width:min(42vw,28vh,150px);
@@ -38,6 +41,7 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
   transition:transform .35s cubic-bezier(.34,1.56,.64,1);
 }
 
+/* Cover (playing) */
 .cover-wrap{
   position:absolute;inset:0;
   border-radius:16px;
@@ -54,6 +58,7 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 .cover-ph{position:absolute;inset:0;display:grid;place-items:center;color:#ffffff30;font-size:clamp(24px,8vh,42px);font-weight:600;pointer-events:none}
 .has-cover .cover-ph{display:none}
 
+/* Big Play button (paused) */
 .big-play{
   position:absolute;inset:0;
   display:grid;place-items:center;
@@ -70,6 +75,7 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 .big-play svg{width:38%;height:38%;fill:#1a1a1a;margin-left:6%}
 .big-play:active{transform:scale(.92)}
 
+/* ===== TRACK PILL (progress + name) ===== */
 .track-pill{
   display:flex;align-items:center;justify-content:center;
   width:min(86%,280px);
@@ -100,6 +106,7 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 .track-pill.no-seek{cursor:default}
 .track-pill:active{transform:scale(.98)}
 
+/* ===== CONTROLS ===== */
 .controls-row{
   display:flex;align-items:center;justify-content:center;gap:14px;
   margin-top:14px;z-index:2;-webkit-app-region:no-drag;
@@ -117,21 +124,62 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
   background:#ffffff22;font-size:18px;color:#fff;
 }
 .ctrl.main:hover{background:#ffffff33}
-.ctrl.like{font-size:16px}
-.ctrl.like.active{color:#ff6b8a;background:#ff6b8a22}
 .ctrl.vol{font-size:15px}
 
+/* Bottom controls only visible when playing */
 .playing-controls{opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .35s,transform .35s}
 .playing .playing-controls{opacity:1;transform:translateY(0);pointer-events:auto}
 
+/* ===== FOOTER ===== */
 .footer{
   display:flex;align-items:center;justify-content:space-between;
   margin-top:10px;padding:0 2px;
   font-size:10px;color:#ffffff55;-webkit-app-region:no-drag;
 }
-.footer-left,.footer-right{cursor:pointer;padding:3px 6px;border-radius:6px;transition:color .15s,background .15s}
-.footer-left:hover,.footer-right:hover{color:#ffffffaa;background:#ffffff10}
+.footer-left{cursor:pointer;padding:3px 6px;border-radius:6px;transition:color .15s,background .15s}
+.footer-left:hover{color:#ffffffaa;background:#ffffff10}
+.footer-right{display:flex;align-items:center;gap:4px}
+.footer-btn{cursor:pointer;padding:3px 7px;border-radius:6px;transition:color .15s,background .15s;color:#ffffff55;font-size:10px}
+.footer-btn:hover{color:#ffffffaa;background:#ffffff10}
+.footer-btn.settings{font-size:12px}
 
+/* ===== SETTINGS PANEL ===== */
+.settings-overlay{
+  position:absolute;inset:0;z-index:30;
+  background:#000a;display:none;align-items:center;justify-content:center;
+  -webkit-app-region:no-drag;
+}
+.settings-overlay.open{display:flex}
+.settings-panel{
+  width:min(92%,300px);max-height:90%;overflow-y:auto;
+  background:#12161c;border:1px solid #ffffff18;border-radius:14px;
+  padding:14px 16px 16px;box-shadow:0 20px 50px #000c;
+}
+.settings-panel h3{font-size:13px;font-weight:700;margin-bottom:12px;color:#fff}
+.s-section{margin-bottom:14px}
+.s-section label{display:block;font-size:10px;color:#ffffff77;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.s-modes{display:flex;flex-wrap:wrap;gap:6px}
+.s-mode{
+  flex:1;min-width:80px;padding:7px 8px;border-radius:8px;
+  background:#ffffff10;border:1px solid #ffffff12;color:#ffffffaa;
+  font-size:11px;text-align:center;cursor:pointer;transition:all .15s;
+}
+.s-mode:hover{background:#ffffff18;color:#fff}
+.s-mode.active{background:#00c8e033;border-color:#00c8e066;color:#7fe8f5}
+.s-color-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.s-color-row input[type=color]{
+  width:36px;height:28px;border:0;border-radius:6px;background:transparent;cursor:pointer;padding:0;
+}
+.s-slider{width:100%;margin-top:4px;accent-color:#00c8e0}
+.s-slider-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.s-slider-row span{font-size:10px;color:#ffffff66;min-width:36px}
+.s-close{
+  display:block;width:100%;margin-top:10px;padding:8px;
+  border-radius:8px;background:#ffffff14;color:#fff;font-size:12px;text-align:center;cursor:pointer;
+}
+.s-close:hover{background:#ffffff22}
+
+/* Resize handles — all sides + corners */
 .rh{position:absolute;z-index:20;background:transparent;-webkit-app-region:no-drag}
 .rh-n{top:0;left:10px;right:10px;height:6px;cursor:ns-resize}
 .rh-s{bottom:0;left:10px;right:10px;height:6px;cursor:ns-resize}
@@ -142,6 +190,7 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 .rh-se{bottom:0;right:0;width:14px;height:14px;cursor:nwse-resize}
 .rh-sw{bottom:0;left:0;width:12px;height:12px;cursor:nesw-resize}
 
+/* Press animation helper */
 .press-pop{animation:pop .28s cubic-bezier(.34,1.56,.64,1)}
 @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
 </style>
@@ -151,44 +200,100 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
   <canvas id="aurora" aria-hidden="true"></canvas>
 
   <div class="ui-layer">
+    <!-- TOP -->
     <div class="top">
       <div class="brand">PLAYERKRUT</div>
       <div class="actions">
-        <button class="version" id="version" title="Версия и изменения">v1.17.0</button>
+        <button class="version" id="version" title="Версия и изменения">v1.18.0</button>
         <button class="winbtn" id="pin" title="Поверх окон">⌖</button>
         <button class="winbtn" id="min" title="Свернуть">—</button>
         <button class="winbtn" id="close" title="Закрыть">×</button>
       </div>
     </div>
 
+    <!-- CENTER -->
     <div class="stage">
       <div class="center-scene" id="centerScene">
+        <!-- Cover (visible when playing) -->
         <div class="cover-wrap" id="coverWrap">
           <div class="cover-ph">♪</div>
           <img id="art" alt="" style="display:none">
         </div>
+        <!-- Big Play (visible when paused) -->
         <button class="big-play" id="bigPlay" title="Play">
           <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </button>
       </div>
 
+      <!-- Track name + progress (always) -->
       <div class="track-pill no-seek" id="title" role="slider" tabindex="0">Ищем музыку…</div>
 
+      <!-- Controls when playing -->
       <div class="controls-row playing-controls">
         <button class="ctrl vol" id="volume" title="Громкость">🔊</button>
         <button class="ctrl" id="previous" title="Предыдущий">⏮</button>
         <button class="ctrl main" id="playpause" title="Pause">⏸</button>
         <button class="ctrl" id="next" title="Следующий">⏭</button>
-        <button class="ctrl like" id="like" title="В избранное">♡</button>
       </div>
     </div>
 
+    <!-- FOOTER -->
     <div class="footer">
       <div class="footer-left" id="openapp" title="Вернуться в приложение">← ЯМузыка</div>
-      <div class="footer-right" id="versionFooter" title="Версия">v1.17.0</div>
+      <div class="footer-right">
+        <div class="footer-btn" id="versionFooter" title="Версия">v1.18.0</div>
+        <div class="footer-btn settings" id="settingsBtn" title="Настройки">⚙</div>
+      </div>
     </div>
   </div>
 
+  <!-- SETTINGS -->
+  <div class="settings-overlay" id="settingsOverlay">
+    <div class="settings-panel">
+      <h3>Настройки</h3>
+
+      <div class="s-section">
+        <label>Фон (облако)</label>
+        <div class="s-modes">
+          <button class="s-mode active" data-bg="argb">ARGB</button>
+          <button class="s-mode" data-bg="static">Статичный</button>
+          <button class="s-mode" data-bg="adaptive">Под обложку</button>
+        </div>
+        <div class="s-color-row" id="staticColorRow" style="display:none">
+          <input type="color" id="staticColor" value="#00c8e0">
+          <span style="font-size:11px;color:#ffffff88">Цвет фона</span>
+        </div>
+      </div>
+
+      <div class="s-section">
+        <label>Эквалайзер (визуал)</label>
+        <div class="s-slider-row">
+          <span>Бас</span>
+          <input class="s-slider" type="range" id="eqBass" min="0" max="200" value="100">
+          <span id="eqBassVal">100%</span>
+        </div>
+        <div class="s-slider-row">
+          <span>Яркость</span>
+          <input class="s-slider" type="range" id="eqBright" min="30" max="150" value="100">
+          <span id="eqBrightVal">100%</span>
+        </div>
+      </div>
+
+      <div class="s-section">
+        <label>Системный цвет</label>
+        <div class="s-modes">
+          <button class="s-mode active" data-sys="auto">Авто</button>
+          <button class="s-mode" data-sys="cyan">Cyan</button>
+          <button class="s-mode" data-sys="purple">Фиолет</button>
+          <button class="s-mode" data-sys="pink">Розовый</button>
+        </div>
+      </div>
+
+      <button class="s-close" id="settingsClose">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- Resize from any side -->
   <div class="rh rh-n" data-dir="n"></div>
   <div class="rh rh-s" data-dir="s"></div>
   <div class="rh rh-e" data-dir="e"></div>
