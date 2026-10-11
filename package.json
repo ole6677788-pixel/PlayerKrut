@@ -1,6 +1,6 @@
 {
   "name": "playerkrut",
-  "version": "1.14.0",
+  "version": "1.15.0",
   "description": "Compact Windows music mini-player with adaptive album art, metadata and bass-reactive liquid background",
   "main": "main.js",
   "scripts": {
