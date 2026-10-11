@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PlayerKrut · 1.19.0</title>
+<title>PLAYERKRUT X LonganLena · v1.19.1</title>
 <style>
 :root{color-scheme:dark}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -20,10 +20,8 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 
 /* ===== TOP BAR ===== */
 .top{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:22px;-webkit-app-region:drag}
-.brand{font-size:9px;font-weight:700;letter-spacing:1.1px;color:#ffffff55}
+.brand{font-size:9px;font-weight:700;letter-spacing:1.1px;color:#ffffff88}
 .actions{display:flex;align-items:center;gap:4px;-webkit-app-region:no-drag}
-.version{padding:3px 8px;border-radius:7px;background:#ffffff12;color:#a0d8e8;font-size:9px;cursor:pointer;transition:background .15s}
-.version:hover{background:#ffffff22}
 .winbtn{display:grid;place-items:center;width:22px;height:22px;border-radius:6px;background:#ffffff10;color:#ffffffb0;font-size:12px;transition:all .15s}
 .winbtn:hover{background:#ffffff28;color:#fff}
 
@@ -41,7 +39,6 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
   transition:transform .35s cubic-bezier(.34,1.56,.64,1);
 }
 
-/* Cover — always visible when we have art */
 .cover-wrap{
   position:absolute;inset:0;
   border-radius:16px;
@@ -61,7 +58,6 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 .cover-ph{position:absolute;inset:0;display:grid;place-items:center;color:#ffffff30;font-size:clamp(24px,8vh,42px);font-weight:600;pointer-events:none}
 .has-cover .cover-ph{display:none}
 
-/* Big Play — only when paused AND no cover */
 .big-play{
   position:absolute;inset:0;
   display:grid;place-items:center;
@@ -83,7 +79,6 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 .big-play svg{width:38%;height:38%;fill:#1a1a1a;margin-left:6%}
 .big-play:active{transform:scale(.92)}
 
-/* Play overlay on cover when paused */
 .cover-play-overlay{
   position:absolute;inset:0;display:grid;place-items:center;
   background:#0006;opacity:0;transition:opacity .25s;cursor:pointer;
@@ -100,8 +95,8 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
   height:36px;
   border-radius:999px;
   background:linear-gradient(90deg,
-    #00c8e0cc 0%,
-    #00c8e0cc var(--track-progress,0%),
+    var(--theme-color,#00c8e0) cc 0%,
+    var(--theme-color,#00c8e0) cc var(--track-progress,0%),
     #ffffff18 var(--track-progress,0%),
     #ffffff18 100%);
   border:1px solid #ffffff18;
@@ -142,9 +137,7 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
   background:#ffffff22;font-size:18px;color:#fff;
 }
 .ctrl.main:hover{background:#ffffff33}
-.ctrl.vol{font-size:15px}
 
-/* Bottom controls only visible when playing */
 .playing-controls{opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .35s,transform .35s}
 .playing .playing-controls{opacity:1;transform:translateY(0);pointer-events:auto}
 
@@ -161,13 +154,13 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 .footer-btn:hover{color:#ffffffaa;background:#ffffff10}
 .footer-btn.settings{font-size:12px}
 
-/* ===== SETTINGS PANEL ===== */
-.settings-overlay{
+/* ===== MODALS & SETTINGS ===== */
+.modal-overlay{
   position:absolute;inset:0;z-index:30;
   background:#000a;display:none;align-items:center;justify-content:center;
   -webkit-app-region:no-drag;
 }
-.settings-overlay.open{display:flex}
+.modal-overlay.open{display:flex}
 .settings-panel{
   width:min(92%,300px);max-height:90%;overflow-y:auto;
   background:#12161c;border:1px solid #ffffff18;border-radius:14px;
@@ -202,7 +195,10 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 }
 .s-close:hover{background:#ffffff22}
 
-/* Resize handles — all sides + corners */
+.changelog-content{font-size:11px;line-height:1.5;color:#ffffffcc}
+.changelog-content ul{padding-left:16px;margin-top:6px}
+
+/* Resize handles */
 .rh{position:absolute;z-index:20;background:transparent;-webkit-app-region:no-drag}
 .rh-n{top:0;left:10px;right:10px;height:6px;cursor:ns-resize}
 .rh-s{bottom:0;left:10px;right:10px;height:6px;cursor:ns-resize}
@@ -213,7 +209,6 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 .rh-se{bottom:0;right:0;width:14px;height:14px;cursor:nwse-resize}
 .rh-sw{bottom:0;left:0;width:12px;height:12px;cursor:nesw-resize}
 
-/* Press animation helper */
 .press-pop{animation:pop .28s cubic-bezier(.34,1.56,.64,1)}
 @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
 </style>
@@ -225,9 +220,8 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
   <div class="ui-layer">
     <!-- TOP -->
     <div class="top">
-      <div class="brand">PLAYERKRUT</div>
+      <div class="brand">PLAYERKRUT X LonganLena</div>
       <div class="actions">
-        <button class="version" id="version" title="Версия и изменения">v1.19.1</button>
         <button class="winbtn" id="pin" title="Поверх окон">⌖</button>
         <button class="winbtn" id="min" title="Свернуть">—</button>
         <button class="winbtn" id="close" title="Закрыть">×</button>
@@ -237,7 +231,6 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
     <!-- CENTER -->
     <div class="stage">
       <div class="center-scene" id="centerScene">
-        <!-- Cover (visible when playing) -->
         <div class="cover-wrap" id="coverWrap">
           <div class="cover-ph">♪</div>
           <img id="art" alt="" style="display:none">
@@ -245,16 +238,13 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
           </div>
         </div>
-        <!-- Big Play (visible when paused) -->
         <button class="big-play" id="bigPlay" title="Play">
           <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </button>
       </div>
 
-      <!-- Track name + progress (always) -->
       <div class="track-pill no-seek" id="title" role="slider" tabindex="0">Ищем музыку…</div>
 
-      <!-- Controls when playing — centered -->
       <div class="controls-row playing-controls">
         <button class="ctrl" id="previous" title="Предыдущий">⏮</button>
         <button class="ctrl main" id="playpause" title="Pause">⏸</button>
@@ -264,16 +254,16 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
 
     <!-- FOOTER -->
     <div class="footer">
-      <div class="footer-left" id="openapp" title="Вернуться в приложение">← ЯМузыка</div>
+      <div class="footer-left" id="openapp" title="Вернуться в приложение">Назад в приложение</div>
       <div class="footer-right">
-        <div class="footer-btn" id="versionFooter" title="Версия">v1.19.1</div>
+        <div class="footer-btn" id="versionFooter" title="Версия и изменения">v1.19.1</div>
         <div class="footer-btn settings" id="settingsBtn" title="Настройки">⚙</div>
       </div>
     </div>
   </div>
 
-  <!-- SETTINGS -->
-  <div class="settings-overlay" id="settingsOverlay">
+  <!-- SETTINGS MODAL -->
+  <div class="modal-overlay" id="settingsOverlay">
     <div class="settings-panel">
       <h3>Настройки</h3>
 
@@ -287,7 +277,7 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
       </div>
 
       <div class="s-section" id="staticColorsSection">
-        <label>Цвет фона</label>
+        <label>Цвет фона и элементов</label>
         <div class="s-modes" id="colorPresets">
           <button class="s-mode color-swatch active" data-color="#00c8e0" style="background:#00c8e0" title="Cyan"></button>
           <button class="s-mode color-swatch" data-color="#7c5cff" style="background:#7c5cff" title="Фиолет"></button>
@@ -300,7 +290,7 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
         </div>
         <div class="s-color-row" style="margin-top:8px">
           <input type="color" id="staticColor" value="#00c8e0">
-          <span style="font-size:11px;color:#ffffff88">Свой цвет</span>
+          <span style="font-size:11px;color:#ffffff88">Полный выбор цвета (Color Picker)</span>
         </div>
       </div>
 
@@ -317,7 +307,25 @@ button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer
     </div>
   </div>
 
-  <!-- Resize from any side -->
+  <!-- CHANGELOG MODAL -->
+  <div class="modal-overlay" id="changelogOverlay">
+    <div class="settings-panel">
+      <h3>PlayerKrut v1.19.1 — Изменения</h3>
+      <div class="changelog-content">
+        <ul>
+          <li>Исправлено масштабирование окна при потягивании за левый край.</li>
+          <li>Перенесено окно изменений (Changelog) прямо в приложение по клику на версию снизу справа.</li>
+          <li>Кнопка внизу слева переименована в «Назад в приложение».</li>
+          <li>Добавлена полноценная ARGB-подсветка и выбор произвольного цвета.</li>
+          <li>Название изменено на PLAYERKRUT X LonganLena.</li>
+          <li>Исправлена синхронизация шкалы времени трека.</li>
+        </ul>
+      </div>
+      <button class="s-close" id="changelogClose">Понятно</button>
+    </div>
+  </div>
+
+  <!-- Resize handles -->
   <div class="rh rh-n" data-dir="n"></div>
   <div class="rh rh-s" data-dir="s"></div>
   <div class="rh rh-e" data-dir="e"></div>
