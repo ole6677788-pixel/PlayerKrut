@@ -3,91 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PlayerKrut · 1.12.1</title>
+<title>PlayerKrut · 1.13.1</title>
 <style>
-:root{color-scheme:dark;--accent:#D98383;--accent-soft:#d997a3;--text:#f8f4f5;--muted:#ffffff9c;--panel:#0b090c;--bar-fill:#e0788f9e;--bar-rail:#ffffff24}
-*{box-sizing:border-box}
-html,body{width:100%;height:100%;min-width:0;min-height:0;margin:0;overflow:hidden;background:transparent;color:var(--text);font-family:Inter,"Segoe UI",Arial,sans-serif;user-select:none}
-body{padding:0}
-button{font:inherit}
-.shell{position:relative;isolation:isolate;display:flex;flex-direction:column;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden;padding:10px 12px 8px;border:1px solid #ffffff12;border-radius:16px;background:#050405f2;box-shadow:0 14px 38px #0008}
-.shell:before{content:"";position:absolute;inset:-28px;z-index:0;pointer-events:none;background-image:linear-gradient(180deg,#0807094d 0%,#0807099c 54%,#080709f2 100%),var(--cover-image,none);background-position:center;background-size:cover;filter:blur(30px) saturate(1.2);opacity:.32;transform:scale(1.12)}
-#aurora{position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none;opacity:1;filter:blur(6px)}
-.ui-layer{position:relative;z-index:1;display:flex;flex:1 1 auto;flex-direction:column;min-width:0;min-height:0}
-.top{display:flex;flex:0 0 auto;align-items:center;justify-content:space-between;gap:8px;min-width:0;min-height:23px;-webkit-app-region:drag}
-.brand{flex:0 0 auto;font-size:9px;font-weight:850;letter-spacing:1.35px;color:#ffffffc9}
-.actions{display:flex;flex:0 0 auto;align-items:center;gap:4px;-webkit-app-region:no-drag}
-.version{padding:4px 6px;border:1px solid #ffffff16;border-radius:8px;background:#ffffff0d;color:#e6b0b0;font-size:9px;white-space:nowrap;cursor:pointer}
-.winbtn{display:grid;flex:0 0 auto;place-items:center;width:23px;height:23px;padding:0;border:1px solid #ffffff12;border-radius:7px;background:#ffffff0b;color:#f4eeee;font-size:13px;cursor:pointer;transition:background .15s ease}
-.winbtn:hover{background:#ffffff20}
-.sizebtn{font-weight:750;color:#f0baba}
-.stage{display:flex;flex:1 1 auto;flex-direction:column;align-items:center;justify-content:center;gap:clamp(5px,1.5vh,10px);min-width:0;min-height:0;padding:6px 0 3px}
-.cover-scene{position:relative;display:grid;flex:0 1 auto;place-items:center;width:min(43vw,30vh,158px);min-width:54px;max-width:48%;aspect-ratio:1;margin:0 auto}
-.cover-cloud{position:absolute;inset:-24%;border-radius:50%;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,#d9838368 0%,#b35bc533 38%,#7151bd12 62%,transparent 74%);filter:blur(clamp(15px,4vh,28px));opacity:.9}
-.orb-wrap{position:relative;width:100%;height:100%;min-width:0;min-height:0}
-.orb{position:absolute;inset:0;overflow:hidden;border:1px solid #ffffff24;border-radius:clamp(9px,2vw,15px);background:linear-gradient(135deg,#3a2c35,#1b171c);box-shadow:0 12px 30px #0009;transition:box-shadow .25s ease}
-.orb img{position:relative;display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
-.cover-ph{position:absolute;inset:0;display:grid;place-items:center;color:#ffffff4d;font-size:clamp(22px,7vh,44px);line-height:1;pointer-events:none}
+:root{color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:transparent;color:#fff;font-family:"Segoe UI",Inter,system-ui,sans-serif;user-select:none}
+button{font:inherit;border:0;background:transparent;color:inherit;cursor:pointer}
+.shell{position:relative;isolation:isolate;display:flex;flex-direction:column;width:100%;height:100%;overflow:hidden;border-radius:16px;background:#000;box-shadow:0 20px 50px #000c}
+#aurora{position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none}
+.ui-layer{position:relative;z-index:1;display:flex;flex:1;flex-direction:column;min-height:0;padding:8px 12px 14px}
+.top{display:flex;align-items:center;justify-content:flex-end;gap:3px;min-height:20px;-webkit-app-region:drag}
+.top .winbtn{opacity:0;transition:opacity .18s}
+.shell:hover .top .winbtn{opacity:.85}
+.winbtn{display:grid;place-items:center;width:20px;height:20px;border-radius:5px;background:#ffffff12;color:#ffffffb0;font-size:11px;-webkit-app-region:no-drag}
+.winbtn:hover{background:#ffffff28;color:#fff}
+.stage{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:0;min-height:0}
+.cover-scene{position:relative;display:grid;place-items:center;width:min(48vw,34vh,168px);aspect-ratio:1;flex:0 0 auto;margin-bottom:clamp(10px,2.5vh,18px);z-index:2}
+.orb-wrap{position:relative;width:100%;height:100%}
+.orb{position:absolute;inset:0;overflow:hidden;border-radius:14px;background:#1a1216;box-shadow:0 8px 32px #000a}
+.orb img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.cover-ph{position:absolute;inset:0;display:grid;place-items:center;color:#ffffff30;font-size:clamp(28px,9vh,48px);pointer-events:none}
 .orb-wrap.has-cover .cover-ph{display:none}
-.orb-wrap.playing .orb{box-shadow:0 12px 30px #0009,0 0 0 1px #d9838340;animation:coverbeat 3.4s ease-in-out infinite}
-.track-info{display:flex;flex:0 1 auto;flex-direction:column;align-items:center;width:100%;max-width:380px;min-width:0;overflow:hidden;padding:0 2px;text-align:center}
-.title{position:relative;display:block;width:100%;max-width:100%;min-width:0;margin:0;padding:8px 14px;overflow:hidden;border:1px solid #ffffff12;border-radius:999px;background:linear-gradient(90deg,var(--bar-fill) 0%,var(--bar-fill) var(--track-progress,0%),var(--bar-rail) var(--track-progress,0%),var(--bar-rail) 100%);box-shadow:0 5px 22px #0003,inset 0 1px #ffffff2b,0 0 18px #d997a31b;color:#fff;font-size:clamp(12px,3.8vw,17px);font-weight:760;line-height:1.2;letter-spacing:-.2px;text-align:center;text-shadow:0 1px 3px #000a;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;touch-action:none;-webkit-app-region:no-drag;transition:filter .15s ease}
-.title:hover{filter:brightness(1.08)}
-.title:focus-visible{outline:2px solid #f3c2cb;outline-offset:2px}
+.orb-wrap.playing .orb{animation:coverbeat 3s ease-in-out infinite}
+.track-info{display:flex;flex-direction:column;align-items:center;width:min(86%,280px);gap:0;z-index:2}
+.title{display:block;width:100%;padding:8px 18px;overflow:hidden;border-radius:999px;background:linear-gradient(90deg,#e0708899 0%,#e0708899 var(--track-progress,0%),#ffffff1a var(--track-progress,0%),#ffffff1a 100%);border:1px solid #ffffff18;color:#fff;font-size:clamp(12px,3.4vw,15px);font-weight:600;line-height:1.3;text-align:center;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;touch-action:none;-webkit-app-region:no-drag;backdrop-filter:blur(8px)}
+.title:hover{filter:brightness(1.1)}
 .title.no-seek{cursor:default}
 .title.no-seek:hover{filter:none}
-.artist{display:block;width:100%;max-width:100%;min-width:0;margin-top:5px;overflow:hidden;color:#ffffffc9;font-size:clamp(10px,2.8vw,12px);line-height:1.25;text-overflow:ellipsis;white-space:nowrap}
-.time-row{display:flex;flex:0 0 auto;align-items:center;justify-content:space-between;width:100%;min-width:0;margin-top:5px;color:#ffffff80;font-size:9px;font-variant-numeric:tabular-nums;pointer-events:none}
-.controls{display:flex;flex:0 0 auto;align-items:center;justify-content:center;gap:clamp(12px,4vw,19px);margin:7px 0 5px}
-.ctrl{display:grid;flex:0 0 auto;place-items:center;width:30px;height:30px;padding:0;border:0;border-radius:50%;background:transparent;color:#ffffffd9;font-size:16px;cursor:pointer;transition:transform .15s ease,background .15s ease}
-.ctrl:hover{transform:scale(1.07);background:#ffffff16}
-.ctrl.main{width:clamp(36px,10vh,44px);height:clamp(36px,10vh,44px);background:#d98383c9;color:#fff;box-shadow:0 5px 22px #d9838328;font-size:19px}
-.ctrl.main:hover{background:#e39a9a}
-.ctrl.open{display:none}
-.footer{display:flex;flex:0 0 auto;align-items:center;gap:8px;min-width:0;padding-top:4px;color:#ffffff70;font-size:8px;letter-spacing:.4px}
-.status{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bass{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#ffffff55}
-.bass.live{color:#e7a9b4}
-.bass.off{color:#ffffff48}
-.source{flex:0 1 auto;max-width:35%;overflow:hidden;text-align:right;text-overflow:ellipsis;white-space:nowrap}
-.changelog{position:absolute;inset:0;z-index:5;display:none;align-items:center;justify-content:center;overflow:auto;padding:12px;border-radius:16px;background:#09080bf0;backdrop-filter:blur(18px)}
-.changelog.open{display:flex}
-.change-card{width:100%;max-width:380px;padding:15px;border:1px solid #ffffff18;border-radius:15px;background:linear-gradient(145deg,#2b2027f5,#141115fa);box-shadow:0 15px 40px #0008}
-.change-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.change-kicker{color:var(--accent);font-size:9px;font-weight:800;letter-spacing:1.8px}
-.change-title{margin-top:3px;font-size:22px;font-weight:800}
-.change-version{margin:8px 0 12px;color:#e7a9b4;font-size:11px}
-.change-item{display:flex;flex-direction:column;gap:4px;padding:9px 0;border-top:1px solid #ffffff12}
-.change-item b{font-size:12px}
-.change-item span{color:#c9bfc5;font-size:11px;line-height:1.4}
-.change-done{width:100%;margin-top:8px;padding:10px;border:0;border-radius:10px;background:var(--accent);color:#241719;font-weight:750;cursor:pointer}
-.resize-grip{position:absolute;right:1px;bottom:1px;z-index:6;width:14px;height:14px;border-radius:0 0 12px 0;background:linear-gradient(135deg,transparent 0 45%,#ffffff24 46% 52%,transparent 53% 64%,#d9838399 65% 72%,transparent 73%);cursor:nwse-resize;touch-action:none}
-.shell.idle .orb-wrap{filter:saturate(.78);opacity:.92}
+.artist{display:none}
+.controls{display:flex;align-items:center;justify-content:center;gap:22px;margin-top:clamp(12px,3vh,20px);z-index:2}
+.ctrl{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;color:#ffffffb8;font-size:15px;transition:transform .12s,color .12s}
+.ctrl:hover{transform:scale(1.12);color:#fff}
+.ctrl.main{width:40px;height:40px;background:#ffffff22;color:#fff;font-size:16px;backdrop-filter:blur(6px)}
+.ctrl.main:hover{background:#ffffff33}
+.resize-grip{position:absolute;right:1px;bottom:1px;z-index:6;width:12px;height:12px;cursor:nwse-resize;touch-action:none;opacity:.35}
 @keyframes coverbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.012)}}
-@media(max-height:340px){
- .shell{padding:6px 9px 5px}
- .stage{flex-direction:row;justify-content:flex-start;gap:10px;padding:3px 0}
- .cover-scene{flex:0 0 auto;width:min(25vh,78px);min-width:46px;max-width:32%}
- .track-info{flex:1 1 auto;align-items:stretch;width:auto;min-width:0;padding:0;text-align:left}
- .title{padding:6px 9px;font-size:clamp(11px,3vw,15px);text-align:left}
- .artist{text-align:left}
- .time-row{margin-top:3px}
- .controls{gap:13px;margin:2px 0 3px}
- .ctrl{width:26px;height:26px}
+@media(max-height:280px){
+ .cover-scene{width:min(28vh,90px);margin-bottom:6px}
+ .controls{gap:14px;margin-top:8px}
  .ctrl.main{width:32px;height:32px}
- .footer{padding-top:2px}
 }
-@media(max-width:330px){
- .shell{padding:7px 8px 5px}
- .brand{font-size:8px;letter-spacing:.8px}
- .actions{gap:2px}
- .version{padding:3px 4px;font-size:8px}
- .winbtn{width:21px;height:21px}
- .stage{gap:5px}
- .controls{gap:10px}
- .source{display:none}
-}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -95,484 +51,34 @@ button{font:inherit}
  <canvas id="aurora" aria-hidden="true"></canvas>
  <div class="ui-layer">
   <div class="top">
-   <div class="brand">PLAYERKRUT</div>
-   <div class="actions">
-    <button class="version" id="version" title="Что нового">v1.12.1</button>
-    <button class="winbtn sizebtn" id="smaller" title="Уменьшить окно" aria-label="Уменьшить окно">−</button>
-    <button class="winbtn sizebtn" id="larger" title="Увеличить окно" aria-label="Увеличить окно">+</button>
-    <button class="winbtn" id="pin" title="Поверх окон" aria-label="Поверх окон">⌖</button>
-    <button class="winbtn" id="min" title="Свернуть" aria-label="Свернуть">—</button>
-    <button class="winbtn" id="close" title="Закрыть" aria-label="Закрыть">×</button>
-   </div>
+   <button class="winbtn" id="pin" title="Поверх окон" aria-label="Поверх окон">⌖</button>
+   <button class="winbtn" id="min" title="Свернуть" aria-label="Свернуть">—</button>
+   <button class="winbtn" id="close" title="Закрыть" aria-label="Закрыть">×</button>
   </div>
   <div class="stage">
    <div class="cover-scene">
-    <div class="cover-cloud"></div>
-    <div class="orb-wrap" id="orbWrap"><div class="orb"><div class="cover-ph" aria-hidden="true">♪</div><img id="art" alt="Обложка текущего трека" style="display:none"></div></div>
+    <div class="orb-wrap" id="orbWrap">
+     <div class="orb">
+      <div class="cover-ph" aria-hidden="true">♪</div>
+      <img id="art" alt="" style="display:none">
+     </div>
+    </div>
    </div>
    <div class="track-info">
-    <div class="title no-seek" id="title" role="slider" tabindex="0" aria-label="Название трека и перемотка" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" title="Нажми или перетащи для перемотки">Ищем музыку…</div>
-    <div class="artist" id="artist">Запусти музыку в поддерживаемом приложении</div>
-    <div class="time-row"><span id="elapsed">0:00</span><span id="duration">0:00</span></div>
+    <div class="title no-seek" id="title" role="slider" tabindex="0" aria-label="Название и перемотка" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">Ищем музыку…</div>
+    <div class="artist" id="artist">Запусти музыку</div>
+   </div>
+   <div class="controls">
+    <button class="ctrl" id="previous" title="Предыдущий" aria-label="Предыдущий">⏮</button>
+    <button class="ctrl main" id="playpause" title="Пауза / Play" aria-label="Пауза / Play">▶</button>
+    <button class="ctrl" id="next" title="Следующий" aria-label="Следующий">⏭</button>
    </div>
   </div>
-  <div class="controls">
-   <button class="ctrl" id="previous" title="Предыдущий трек" aria-label="Предыдущий трек">⏮</button>
-   <button class="ctrl main" id="playpause" title="Воспроизведение или пауза" aria-label="Воспроизведение или пауза">▶</button>
-   <button class="ctrl" id="next" title="Следующий трек" aria-label="Следующий трек">⏭</button>
-   <button class="ctrl open" id="openapp" title="Вернуться в приложение с музыкой">↗ Открыть</button>
-  </div>
-  <div class="footer"><div class="status" id="status">ОЖИДАНИЕ МУЗЫКИ</div><div class="bass off" id="bassState" title="">ЗВУК: НЕ ПОДКЛЮЧЁН</div><div class="source" id="source">DESKTOP PLAYER</div></div>
  </div>
- <div class="changelog" id="changelog" aria-hidden="true">
-  <div class="change-card">
-   <div class="change-head"><div><div class="change-kicker">PLAYERKRUT</div><div class="change-title">Что нового</div></div><button class="winbtn" id="closeChanges" aria-label="Закрыть список изменений">×</button></div>
-   <div class="change-version">Версия 1.12.1 · 11.10.2026</div>
-   <div class="change-item"><b>Большое жидкое пятно как в Яндекс Музыке</b><span>Крупная органичная форма за обложкой с тёмными краями и светлым ядром; на бас она заметно раздувается и ярче светится.</span></div>
-   <div class="change-item"><b>Название и исполнитель</b><span>PowerShell теперь запускается в кодировке UTF-8 и без проблем с кавычками; если источник не передал название, на экране видно, какое приложение его не отдаёт.</span></div>
-   <button class="change-done" id="doneChanges">Понятно</button>
-  </div>
- </div>
- <div class="resize-grip" id="resizeGrip" title="Потяни, чтобы изменить размер"></div>
+ <div class="resize-grip" id="resizeGrip" title="Изменить размер"></div>
 </div>
 <script>
-'use strict';
-const $ = id => document.getElementById(id);
-const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-const fmt = value => { const s = Math.max(0, Math.floor(Number(value) || 0)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
-const setText = (node, text) => { if (node.textContent !== text) node.textContent = text; };
-
-const dom = {
- shell: $('shell'), title: $('title'), artist: $('artist'), elapsed: $('elapsed'), duration: $('duration'),
- art: $('art'), orbWrap: $('orbWrap'), status: $('status'), source: $('source'), bass: $('bassState'), playpause: $('playpause')
-};
-const state = {
- busy: false, dragging: false, playing: false,
- basePosition: 0, baseDuration: 0, baseStamp: Date.now(), basePlaying: false,
- seekTarget: 0, ignorePollUntil: 0, coverId: 0,
- statusText: 'ОЖИДАНИЕ МУЗЫКИ', statusUntil: 0, statusTimer: 0
-};
-
-/* ---------- Прогресс и перемотка (единственная шкала — плашка названия) ---------- */
-function currentPosition() {
- const raw = state.basePosition + (state.basePlaying ? (Date.now() - state.baseStamp) / 1000 : 0);
- return state.baseDuration > 0 ? clamp(raw, 0, state.baseDuration) : Math.max(0, raw);
-}
-let lastPct = '', lastSec = -1, lastDur = -1;
-function renderProgress(position) {
- const dur = state.baseDuration;
- const pct = (dur > 0 ? clamp(position / dur * 100, 0, 100) : 0).toFixed(2) + '%';
- if (pct !== lastPct) { dom.title.style.setProperty('--track-progress', pct); lastPct = pct; }
- const sec = Math.floor(position), d = Math.floor(dur);
- if (sec !== lastSec) {
-  lastSec = sec;
-  setText(dom.elapsed, fmt(position));
-  dom.title.setAttribute('aria-valuenow', String(sec));
-  dom.title.setAttribute('aria-valuetext', fmt(position) + (dur > 0 ? ' из ' + fmt(dur) : ''));
- }
- if (d !== lastDur) {
-  lastDur = d;
-  setText(dom.duration, fmt(dur));
-  dom.title.setAttribute('aria-valuemax', String(d));
-  dom.title.classList.toggle('no-seek', !(dur > 0));
- }
-}
-function flashStatus(text) {
- state.statusUntil = Date.now() + 2600;
- setText(dom.status, text);
- clearTimeout(state.statusTimer);
- state.statusTimer = setTimeout(() => { state.statusUntil = 0; setText(dom.status, state.statusText); }, 2650);
-}
-
-/* ---------- Обложка, название, исполнитель ---------- */
-let wantedCover = '';
-dom.art.addEventListener('load', () => {
- if (dom.art.getAttribute('src') !== wantedCover || !wantedCover) return;
- dom.art.style.display = 'block';
- dom.orbWrap.classList.add('has-cover');
- dom.shell.style.setProperty('--cover-image', 'url("' + wantedCover.replace(/"/g, '%22') + '")');
-});
-dom.art.addEventListener('error', () => {
- if (dom.art.getAttribute('src') !== wantedCover) return;
- clearCover();
-});
-function clearCover() {
- wantedCover = '';
- dom.art.removeAttribute('src');
- dom.art.style.display = 'none';
- dom.orbWrap.classList.remove('has-cover');
- dom.shell.style.setProperty('--cover-image', 'none');
-}
-function setCover(src) {
- if (!src) { if (wantedCover || dom.art.hasAttribute('src')) clearCover(); return; }
- if (src === wantedCover) return;
- wantedCover = src;
- dom.art.src = src;
-}
-function coverSource(d) {
- const t = String(d.thumbnail || '');
- if (!t) return '';
- return t.startsWith('data:') ? t : 'data:' + (d.thumbnailType || 'image/jpeg') + ';base64,' + t;
-}
-
-function applyNowPlaying(d) {
- const has = !!d.title, playing = !!d.playing, now = Date.now();
- state.playing = playing;
- dom.shell.classList.toggle('idle', !playing);
- dom.orbWrap.classList.toggle('playing', playing);
- setText(dom.title, has ? String(d.title) : 'Ничего не играет');
- const appName = String(d.app || '').split('!')[0].split('.').pop();
- setText(dom.artist, has ? (d.artist || 'Неизвестный исполнитель') : d.error ? String(d.error) : appName ? 'Источник «' + appName + '» не передал название трека' : 'Запусти музыку — я покажу трек');
- setText(dom.source, has ? String(d.app || 'DESKTOP').split('!')[0].split('.').pop().slice(0, 24).toUpperCase() : 'DESKTOP PLAYER');
- setText(dom.playpause, playing ? 'Ⅱ' : '▶');
- state.statusText = d.error ? 'ОШИБКА МЕДИАСЕССИИ' : playing ? 'ВОСПРОИЗВЕДЕНИЕ' : has ? 'ПАУЗА' : 'ОЖИДАНИЕ МУЗЫКИ';
- if (now >= state.statusUntil) setText(dom.status, state.statusText);
-
- if (playing !== state.basePlaying) {
-  state.basePosition = currentPosition(); state.baseStamp = now; state.basePlaying = playing;
- }
- state.baseDuration = Math.max(0, Number(d.duration) || 0);
- if (!state.dragging && now >= state.ignorePollUntil) {
-  state.basePosition = Math.max(0, Number(d.position) || 0);
-  state.baseStamp = now;
- }
- if (!state.dragging) renderProgress(currentPosition());
-
- const cid = Number(d.coverId) || 0;
- if (!has || cid === 0) { state.coverId = 0; setCover(''); }
- else if (d.thumbnail) {
-  const src = coverSource(d);
-  if (src) { state.coverId = cid; setCover(src); }
- }
-}
-async function update() {
- if (state.busy || document.hidden) return;
- state.busy = true;
- try {
-  const d = await window.playerAPI.getNowPlaying(state.coverId);
-  applyNowPlaying(d || {});
- } catch (error) {
-  setText(dom.title, 'Музыка пока не найдена');
-  setText(dom.artist, 'Windows: ' + String(error && error.message || 'не удалось прочитать данные'));
-  clearCover(); state.coverId = 0;
- } finally { state.busy = false; }
-}
-async function control(action, position) {
- let result;
- try { result = await window.playerAPI.control(action, position); }
- catch (error) { result = { ok: false, message: String(error && error.message || error) }; }
- setTimeout(update, 450);
- return result;
-}
-
-/* ---------- Кнопки ---------- */
-const changelog = $('changelog');
-function toggleChanges(open) { changelog.classList.toggle('open', open); changelog.setAttribute('aria-hidden', String(!open)); }
-$('version').onclick = () => toggleChanges(true);
-$('closeChanges').onclick = () => toggleChanges(false);
-$('doneChanges').onclick = () => toggleChanges(false);
-$('previous').onclick = () => control('previous');
-$('playpause').onclick = () => control('playpause');
-$('next').onclick = () => control('next');
-$('openapp').onclick = async () => {
- const button = $('openapp');
- const result = await window.playerAPI.openSourceApp();
- button.textContent = result && result.ok ? '✓ Открыто' : 'Не найдено';
- setTimeout(() => { button.textContent = '↗ Открыть'; }, 1800);
-};
-$('close').onclick = () => window.playerAPI.close();
-$('min').onclick = () => window.playerAPI.minimize();
-$('pin').onclick = () => window.playerAPI.togglePin();
-
-/* ---------- Перемотка мышью и клавиатурой ---------- */
-async function commitSeek(target) {
- state.basePosition = target; state.baseStamp = Date.now();
- state.ignorePollUntil = Date.now() + 1500;
- renderProgress(target);
- const result = await control('seek', target);
- if (!result || !result.ok) {
-  state.ignorePollUntil = 0;
-  flashStatus(result && result.message === 'UNSUPPORTED' ? 'ИСТОЧНИК НЕ ПОДДЕРЖИВАЕТ ПЕРЕМОТКУ' : 'НЕ УДАЛОСЬ ПЕРЕМОТАТЬ');
- }
-}
-function seekFromPointer(event) {
- const rect = dom.title.getBoundingClientRect();
- const fraction = clamp((event.clientX - rect.left) / Math.max(1, rect.width), 0, 1);
- state.seekTarget = Math.round(state.baseDuration * fraction);
- renderProgress(state.seekTarget);
-}
-dom.title.addEventListener('pointerdown', event => {
- if (state.baseDuration <= 0 || (event.pointerType === 'mouse' && event.button !== 0)) return;
- state.dragging = true;
- try { dom.title.setPointerCapture(event.pointerId); } catch (_) {}
- seekFromPointer(event); event.preventDefault();
-});
-dom.title.addEventListener('pointermove', event => { if (state.dragging) seekFromPointer(event); });
-function endDrag(event, commit) {
- if (!state.dragging) return;
- try { dom.title.releasePointerCapture(event.pointerId); } catch (_) {}
- state.dragging = false;
- if (commit) commitSeek(state.seekTarget);
- else { state.ignorePollUntil = 0; renderProgress(currentPosition()); update(); }
-}
-dom.title.addEventListener('pointerup', event => endDrag(event, true));
-dom.title.addEventListener('pointercancel', event => endDrag(event, false));
-
-let keyTarget = null, keyTimer = 0;
-const keySteps = { ArrowLeft: -5, ArrowDown: -5, ArrowRight: 5, ArrowUp: 5, PageDown: -15, PageUp: 15 };
-dom.title.addEventListener('keydown', event => {
- if (state.baseDuration <= 0) return;
- const isStep = Object.prototype.hasOwnProperty.call(keySteps, event.key);
- if (!isStep && event.key !== 'Home' && event.key !== 'End') return;
- event.preventDefault();
- let target = keyTarget === null ? currentPosition() : keyTarget;
- if (isStep) target += keySteps[event.key];
- else target = event.key === 'Home' ? 0 : state.baseDuration;
- target = clamp(target, 0, state.baseDuration);
- keyTarget = target;
- state.basePosition = target; state.baseStamp = Date.now();
- state.ignorePollUntil = Date.now() + 1500;
- renderProgress(target);
- clearTimeout(keyTimer);
- keyTimer = setTimeout(() => { const t = keyTarget; keyTarget = null; if (t !== null) commitSeek(t); }, 250);
-});
-
-/* ---------- Размер окна ---------- */
-async function changeSize(dw, dh) {
- const size = await window.playerAPI.getWindowSize();
- window.playerAPI.resizeTo(clamp(size.width + dw, 280, 760), clamp(size.height + dh, 210, 620));
-}
-$('smaller').onclick = () => changeSize(-48, -32);
-$('larger').onclick = () => changeSize(48, 32);
-const grip = $('resizeGrip');
-let resizing = false, startX = 0, startY = 0, startW = 0, startH = 0, resizeFrame = 0;
-grip.addEventListener('pointerdown', event => {
- resizing = true; startX = event.screenX; startY = event.screenY;
- const bounds = dom.shell.getBoundingClientRect(); startW = bounds.width; startH = bounds.height;
- try { grip.setPointerCapture(event.pointerId); } catch (_) {}
- event.preventDefault(); event.stopPropagation();
-});
-grip.addEventListener('pointermove', event => {
- if (!resizing) return;
- const width = clamp(startW + event.screenX - startX, 280, 760);
- const height = clamp(startH + event.screenY - startY, 210, 620);
- cancelAnimationFrame(resizeFrame);
- resizeFrame = requestAnimationFrame(() => window.playerAPI.resizeTo(width, height));
-});
-const stopResize = () => { resizing = false; };
-grip.addEventListener('pointerup', stopResize);
-grip.addEventListener('pointercancel', stopResize);
-grip.addEventListener('lostpointercapture', stopResize);
-
-/* ---------- Захват системного звука (один раз, без утечек) ---------- */
-const audio = { ctx: null, stream: null, source: null, analyser: null, sink: null, data: null, state: 'idle', starting: null, retries: 0, retryTimer: 0, gestureTried: false };
-function setBassUi(kind) {
- const map = {
-  idle: ['off', 'ЗВУК: НЕ ПОДКЛЮЧЁН', ''],
-  connecting: ['off', 'ЗАХВАТ ЗВУКА…', ''],
-  live: ['live', 'БАС: РЕАЛЬНЫЙ ЗВУК', 'Анимация реагирует на низкие частоты системного звука'],
-  unavailable: ['off', 'НЕТ ЗАХВАТА ЗВУКА', 'Системный звук недоступен: анимация не реагирует на бас, а только плавно дрейфует']
- };
- const [cls, text, hint] = map[kind];
- dom.bass.className = 'bass ' + cls;
- setText(dom.bass, text);
- dom.bass.title = hint;
-}
-function stopAudio() {
- const { source, analyser, sink, stream, ctx } = audio;
- clearTimeout(audio.retryTimer);
- for (const node of [source, analyser, sink]) { try { node && node.disconnect(); } catch (_) {} }
- if (stream) stream.getTracks().forEach(track => { track.onended = null; try { track.stop(); } catch (_) {} });
- if (ctx) { ctx.onstatechange = null; if (ctx.state !== 'closed') ctx.close().catch(() => {}); }
- audio.ctx = audio.stream = audio.source = audio.analyser = audio.sink = audio.data = null;
- audio.state = 'idle';
- agc.init = false;
-}
-async function acquireStream() {
- try {
-  const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-  if (stream.getAudioTracks().length) return stream;
-  stream.getTracks().forEach(track => track.stop());
- } catch (error) { console.warn('getDisplayMedia loopback failed:', error); }
- const info = await window.playerAPI.getAudioLoopbackSource();
- if (!info || !info.sourceId) throw new Error(info && info.error || 'нет источника звука');
- return navigator.mediaDevices.getUserMedia({
-  audio: { mandatory: { chromeMediaSource: 'desktop', chromeMediaSourceId: info.sourceId } },
-  video: { mandatory: { chromeMediaSource: 'desktop', chromeMediaSourceId: info.sourceId } }
- });
-}
-function onAudioLost() {
- stopAudio();
- setBassUi('unavailable');
- if (audio.retries < 3) {
-  audio.retries++;
-  audio.retryTimer = setTimeout(startAudio, 5000 * audio.retries);
- }
-}
-function startAudio() {
- if (audio.state === 'live') return Promise.resolve(true);
- if (audio.starting) return audio.starting;
- audio.starting = (async () => {
-  setBassUi('connecting');
-  try {
-   const stream = await acquireStream();
-   audio.stream = stream;
-   stream.getVideoTracks().forEach(track => { track.stop(); stream.removeTrack(track); });
-   const track = stream.getAudioTracks()[0];
-   if (!track) throw new Error('в потоке нет звуковой дорожки');
-   const ctx = new AudioContext({ latencyHint: 'playback' });
-   audio.ctx = ctx;
-   if (ctx.state === 'suspended') await ctx.resume();
-   audio.source = ctx.createMediaStreamSource(stream);
-   audio.analyser = ctx.createAnalyser();
-   audio.analyser.fftSize = 2048;
-   audio.analyser.smoothingTimeConstant = .6;
-   audio.analyser.minDecibels = -85;
-   audio.analyser.maxDecibels = -25;
-   audio.sink = ctx.createGain();
-   audio.sink.gain.value = 0;
-   audio.source.connect(audio.analyser);
-   audio.analyser.connect(audio.sink);
-   audio.sink.connect(ctx.destination);
-   audio.data = new Uint8Array(audio.analyser.frequencyBinCount);
-   track.onended = onAudioLost;
-   ctx.onstatechange = () => { if (ctx.state === 'suspended') ctx.resume().catch(() => {}); };
-   audio.state = 'live';
-   audio.retries = 0;
-   setBassUi('live');
-   return true;
-  } catch (error) {
-   console.warn('System audio capture unavailable:', error);
-   stopAudio();
-   setBassUi('unavailable');
-   return false;
-  } finally { audio.starting = null; }
- })();
- return audio.starting;
-}
-window.addEventListener('pointerdown', () => {
- if (audio.state !== 'live' && !audio.starting && !audio.gestureTried) { audio.gestureTried = true; startAudio(); }
-}, { passive: true });
-window.addEventListener('beforeunload', stopAudio);
-
-const agc = { init: false, hi: 0, lo: 0 };
-function sampleBass(dt) {
- if (audio.state !== 'live' || !audio.analyser || !state.playing) { agc.init = false; return 0; }
- audio.analyser.getByteFrequencyData(audio.data);
- const hzPerBin = audio.ctx.sampleRate / audio.analyser.fftSize;
- const low = Math.max(1, Math.floor(35 / hzPerBin));
- const high = Math.min(audio.data.length - 1, Math.ceil(170 / hzPerBin));
- let sum = 0, peak = 0, count = 0;
- for (let i = low; i <= high; i++) { const v = audio.data[i] / 255; sum += v; if (v > peak) peak = v; count++; }
- const raw = count ? (sum / count) * .65 + peak * .35 : 0;
- if (!agc.init) { agc.hi = raw; agc.lo = raw; agc.init = true; }
- agc.hi = Math.max(raw, agc.hi - dt * .06);
- agc.lo = Math.min(raw, agc.lo + dt * .04);
- if (raw < .05) return 0;
- const n = clamp((raw - agc.lo) / Math.max(.14, agc.hi - agc.lo), 0, 1);
- return n * n;
-}
-
-/* ---------- Жидкая анимация: большое органичное пятно за обложкой ---------- */
-const aurora = (() => {
- const canvas = $('aurora'), ctx = canvas.getContext('2d');
- const SCALE = .5, POINTS = 72;
- const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- // Формы: главное тёмно-малиновое пятно и два более светлых слоя поверх него.
- const blobs = [
-  { fx: 0, fy: -.02, rx: .43, ry: .40, seed: .3, sx: .16, sy: .13, k: .10, lobes: [2, 3, 5], amp: [.15, .10, .045], hl: -.28,
-    c: ['rgba(226,52,88,.96)', 'rgba(150,22,52,.94)', 'rgba(52,6,22,.92)'] },
-  { fx: -.14, fy: .06, rx: .27, ry: .24, seed: 2.6, sx: .21, sy: .18, k: .16, lobes: [3, 4, 2], amp: [.13, .08, .05], hl: -.2,
-    c: ['rgba(255,138,178,.55)', 'rgba(214,66,128,.34)', 'rgba(160,40,120,0)'] },
-  { fx: .17, fy: -.08, rx: .22, ry: .20, seed: 4.4, sx: .14, sy: .22, k: .20, lobes: [2, 5, 3], amp: [.14, .06, .05], hl: .1,
-    c: ['rgba(190,110,235,.40)', 'rgba(140,60,200,.24)', 'rgba(90,40,170,0)'] }
- ];
- let w = 1, h = 1, raf = 0, last = 0, t = 0, level = 0;
- function resize() {
-  const r = canvas.getBoundingClientRect();
-  const nw = Math.max(1, Math.round(r.width * SCALE)), nh = Math.max(1, Math.round(r.height * SCALE));
-  if (canvas.width !== nw) canvas.width = nw;
-  if (canvas.height !== nh) canvas.height = nh;
-  w = nw; h = nh;
- }
- function pathBlob(b, grow) {
-  const cx = w * (.5 + b.fx) + Math.sin(t * b.sx + b.seed) * w * .045;
-  const cy = h * (.44 + b.fy) + Math.cos(t * b.sy + b.seed * 1.7) * h * .04;
-  const rx = w * b.rx * (1 + level * b.k) * grow, ry = h * b.ry * (1 + level * b.k) * grow;
-  const boost = 1 + level * 1.1;
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(Math.sin(t * .22 + b.seed) * .16);
-  ctx.beginPath();
-  for (let i = 0; i <= POINTS; i++) {
-   const a = i / POINTS * Math.PI * 2;
-   let wave = 0;
-   for (let j = 0; j < 3; j++) wave += Math.sin(a * b.lobes[j] + t * (.55 + j * .27) * (j % 2 ? -1 : 1) + b.seed * (j + 1)) * b.amp[j] * boost;
-   const px = Math.cos(a) * rx * (1 + wave), py = Math.sin(a) * ry * (1 + wave);
-   if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-  }
-  ctx.closePath();
-  return { rx, ry };
- }
- function drawBlob(b) {
-  const { rx, ry } = pathBlob(b, 1);
-  const R = Math.max(rx, ry);
-  const g = ctx.createRadialGradient(R * b.hl, -R * .05, 0, 0, 0, R * 1.12);
-  g.addColorStop(0, b.c[0]); g.addColorStop(.55, b.c[1]); g.addColorStop(1, b.c[2]);
-  ctx.fillStyle = g; ctx.fill();
-  ctx.restore();
- }
- function frame(now) {
-  raf = 0;
-  if (document.hidden) return;
-  const interval = state.playing ? 0 : 40;
-  if (now - last < interval) { raf = requestAnimationFrame(frame); return; }
-  const dt = Math.min(.1, Math.max(.001, (now - last) / 1000));
-  last = now;
-  const target = sampleBass(dt);
-  level += (target - level) * (1 - Math.pow(1 - (target > level ? .38 : .09), dt * 60));
-  t += dt * (state.playing ? 1 : .5) * (reduce ? .3 : 1);
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, w, h);
-  ctx.globalAlpha = state.playing ? 1 : .72;
-  // внешнее мягкое свечение вокруг главного пятна
-  ctx.globalCompositeOperation = 'lighter';
-  const m = blobs[0];
-  pathBlob(m, 1.22);
-  ctx.fillStyle = 'rgba(190,30,70,' + (.10 + level * .22) + ')';
-  ctx.fill(); ctx.restore();
-  // пятна
-  ctx.globalCompositeOperation = 'source-over';
-  drawBlob(blobs[0]);
-  ctx.globalCompositeOperation = 'screen';
-  drawBlob(blobs[1]);
-  drawBlob(blobs[2]);
-  // светлое ядро: реально усиливается только от баса
-  const cx = w * .5, cy = h * .42, core = Math.min(w, h) * (.30 + level * .10);
-  const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, core);
-  cg.addColorStop(0, 'rgba(255,120,160,' + (.10 + level * .38) + ')');
-  cg.addColorStop(1, 'rgba(255,120,160,0)');
-  ctx.globalCompositeOperation = 'lighter';
-  ctx.fillStyle = cg; ctx.fillRect(0, 0, w, h);
-  raf = requestAnimationFrame(frame);
- }
- function start() { if (!raf && !document.hidden) { last = performance.now(); raf = requestAnimationFrame(frame); } }
- function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
- if (typeof ResizeObserver === 'function') new ResizeObserver(resize).observe(canvas);
- else window.addEventListener('resize', resize);
- resize();
- return { start, stop };
-})();
-
-document.addEventListener('visibilitychange', () => {
- if (document.hidden) aurora.stop(); else { aurora.start(); update(); }
-});
-
-aurora.start();
-startAudio();
-update();
-setInterval(update, 1800);
-setInterval(() => { if (!state.dragging && !document.hidden) renderProgress(currentPosition()); }, 200);
+PLACEHOLDER_SCRIPT
 </script>
 </body>
 </html>
